@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLThuocBenhVien.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using QLThuocBenhVien.Models;
 namespace QLThuocBenhVien.Controllers
 {
     public class ThuocController : Controller
@@ -33,6 +33,87 @@ namespace QLThuocBenhVien.Controllers
 
             var danhSachThuoc = await query.ToListAsync();
             return View(danhSachThuoc);
+        }
+        // ==========================================
+        // 1. CHỨC NĂNG THÊM MỚI (CREATE)
+        // ==========================================
+        [HttpGet]
+        public IActionResult Create()
+        {
+            // Đổ dữ liệu vào Dropdown chọn Nhà Cung Cấp và Đơn Vị Tính
+            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC");
+            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Thuoc thuoc)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(thuoc);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
+            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+            return View(thuoc);
+        }
+
+        // ==========================================
+        // 2. CHỨC NĂNG CHỈNH SỬA (EDIT)
+        // ==========================================
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var thuoc = await _context.Thuoc.FindAsync(id);
+            if (thuoc == null) return NotFound();
+
+            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
+            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+            return View(thuoc);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Thuoc thuoc)
+        {
+            if (id != thuoc.MaThuoc) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(thuoc);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Thuoc.Any(e => e.MaThuoc == thuoc.MaThuoc)) return NotFound();
+                    else throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
+            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+            return View(thuoc);
+        }
+
+        // ==========================================
+        // 3. CHỨC NĂNG XÓA (DELETE)
+        // ==========================================
+        public async Task<IActionResult> Delete(int id)
+        {
+            var thuoc = await _context.Thuoc.FindAsync(id);
+            if (thuoc != null)
+            {
+                _context.Thuoc.Remove(thuoc);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

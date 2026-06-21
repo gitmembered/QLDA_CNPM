@@ -49,9 +49,10 @@
         <h3 class="fw-bold mb-1">Danh Mục Kho Thuốc</h3>
         <p class="text-muted mb-0">Quản lý và theo dõi tồn kho của bệnh viện.</p>
     </div>
-    <button class="btn btn-primary px-4 fw-medium shadow-sm" style="border-radius: 8px;">
+    <a asp-controller="Thuoc" asp-action="Create" class="btn btn-primary px-4 fw-medium shadow-sm"
+       style="border-radius: 8px;">
         <i class="bi bi-plus-lg me-2"></i>Thêm Mới
-    </button>
+    </a>
 </div>
 
 <div class="custom-card p-0 overflow-hidden">
@@ -119,8 +120,15 @@
                                 }
                             </td>
                             <td class="text-end pe-4">
-                                <a href="#" class="text-primary me-3 text-decoration-none"><i class="bi bi-pencil"></i></a>
-                                <a href="#" class="text-danger text-decoration-none"><i class="bi bi-trash"></i></a>
+                                <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="text-primary me-3 text-decoration-none"
+                                   title="Chỉnh sửa">
+                                    <i class="bi bi-pencil fs-5"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="text-danger text-decoration-none"
+                                   title="Xóa"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa loại thuốc này khỏi hệ thống?');">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </a>
                             </td>
                         </tr>
                     }

@@ -1,0 +1,69 @@
+@model QLThuocBenhVien.Models.Thuoc
+@{
+    ViewData["Title"] = "Thêm Thuốc Mới";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Thêm Thuốc Mới</h3>
+    <p class="text-muted">Nhập đầy đủ thông tin để thêm thuốc vào danh mục hệ thống.</p>
+</div>
+
+<div class="custom-card">
+    <form asp-action="Create" method="post">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark fs-sm">Tên Thuốc <span class="text-danger">*</span></label>
+                <input asp-for="TenThuoc" class="form-control" required placeholder="VD: Paracetamol 500mg" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark fs-sm">Hoạt Chất <span class="text-danger">*</span></label>
+                <input asp-for="HoatChat" class="form-control" required placeholder="VD: Paracetamol" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-dark fs-sm">Giá Nhập (VNĐ)</label>
+                <input asp-for="GiaNhap" type="number" class="form-control" value="0" min="0" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-dark fs-sm">Giá Bán (VNĐ)</label>
+                <input asp-for="GiaBan" type="number" class="form-control" value="0" min="0" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-dark fs-sm">Số Lượng Tồn</label>
+                <input asp-for="SoLuongTon" type="number" class="form-control" value="0" min="0" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold text-dark fs-sm">Hạn Sử Dụng</label>
+                <input asp-for="HanSuDung" type="date" class="form-control" required />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark fs-sm">Nhà Cung Cấp</label>
+                <select asp-for="MaNCC" class="form-select" asp-items="ViewBag.MaNCC">
+                    <option value="">-- Chọn Nhà Cung Cấp --</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold text-dark fs-sm">Đơn Vị Tính</label>
+                <select asp-for="MaDVT" class="form-select" asp-items="ViewBag.MaDVT">
+                    <option value="">-- Chọn Đơn Vị --</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label fw-bold text-dark fs-sm">Công Dụng / Chỉ Định</label>
+                <textarea asp-for="CongDung" class="form-control" rows="3"
+                          placeholder="Ghi chú về công dụng..."></textarea>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center mt-5 pt-3 border-top">
+            <a asp-action="Index" class="btn btn-light me-3 fw-medium">Hủy bỏ</a>
+            <button type="submit" class="btn btn-primary px-4 fw-medium shadow-sm" style="border-radius: 8px;">
+                <i class="bi bi-floppy me-2"></i>Lưu Thuốc
+            </button>
+        </div>
+    </form>
+</div>
