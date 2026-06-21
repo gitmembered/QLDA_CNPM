@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QLThuocBenhVien")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b40bcc7b99bf0be6d68ebf08eb1e43da20e81c95")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ac263ec727d8935cd48f3feda88013a6547a439")]
 [assembly: System.Reflection.AssemblyProductAttribute("QLThuocBenhVien")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QLThuocBenhVien")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
