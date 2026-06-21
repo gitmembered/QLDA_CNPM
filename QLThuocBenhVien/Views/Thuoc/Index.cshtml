@@ -1,46 +1,152 @@
 ﻿@model IEnumerable<QLThuocBenhVien.Models.Thuoc>
-
 @{
-    ViewData["Title"] = "Danh Mục Thuốc Theo Nhóm Bệnh";
+    ViewData["Title"] = "Inventory";
 }
 
-<h2 class="text-primary mt-4">Danh Mục Thuốc Bệnh Viện</h2>
+<style>
+    /* CSS ghi đè riêng cho trang này để bảng đẹp hơn */
+    .table th {
+        border-bottom: 2px solid #E5E7EB;
+        color: #6B7280;
+        font-size: 0.85rem;
+        padding: 15px;
+        background: white;
+    }
 
-<form asp-action="Index" method="get" class="mb-4 d-flex align-items-center">
-    <label class="me-2 fw-bold">Chọn nhóm bệnh điều trị:</label>
-    <select name="maNhomBenh" asp-items="ViewBag.NhomBenhList" class="form-select w-25 me-2">
-        <option value="">-- Tất cả nhóm bệnh --</option>
-    </select>
-    <button type="submit" class="btn btn-success">Lọc Thuốc</button>
-</form>
+    .table td {
+        vertical-align: middle;
+        padding: 15px;
+        border-bottom: 1px solid #E5E7EB;
+        color: #374151;
+        font-weight: 500;
+    }
 
-<table class="table table-bordered table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Mã Thuốc</th>
-            <th>Tên Thuốc</th>
-            <th>Hoạt Chất</th>
-            <th>Nhóm Bệnh Điều Trị</th>
-            <th>Tồn Kho</th>
-            <th>Hạn Sử Dụng</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.MaThuoc</td>
-                <td class="fw-bold">@item.TenThuoc</td>
-                <td>@item.HoatChat</td>
-                <td>
-                    @foreach (var tnb in item.ThuocNhomBenhs)
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-safe {
+        background-color: #DEF7EC;
+        color: #03543F;
+    }
+
+    .status-warning {
+        background-color: #FEF3C7;
+        color: #92400E;
+    }
+
+    .status-critical {
+        background-color: #FDE8E8;
+        color: #9B1C1C;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Danh Mục Kho Thuốc</h3>
+        <p class="text-muted mb-0">Quản lý và theo dõi tồn kho của bệnh viện.</p>
+    </div>
+    <button class="btn btn-primary px-4 fw-medium shadow-sm" style="border-radius: 8px;">
+        <i class="bi bi-plus-lg me-2"></i>Thêm Mới
+    </button>
+</div>
+
+<div class="custom-card p-0 overflow-hidden">
+    <div class="p-4 border-bottom" style="background-color: #F9FAFB;">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0 shadow-none"
+                           placeholder="Tìm kiếm thuốc theo tên hoặc mã...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select text-muted">
+                    <option>Tất cả nhóm bệnh</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select text-muted">
+                    <option>Tất cả trạng thái</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên Thuốc</th>
+                    <th>Nhóm Bệnh</th>
+                    <th>Tồn Kho</th>
+                    <th>Trạng Thái</th>
+                    <th class="text-end pe-4">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
                     {
-                        <span class="badge bg-info text-dark">@tnb.NhomBenh.TenNhomBenh</span>
+                        <tr>
+                            <td class="fw-bold text-dark">MED-@item.MaThuoc.ToString("D3")</td>
+                            <td>@item.TenThuoc</td>
+                            <td>
+                                @if (item.ThuocNhomBenhs.Any())
+                                {
+                                    @item.ThuocNhomBenhs.First().NhomBenh.TenNhomBenh
+                                }
+                            </td>
+                            <td>@item.SoLuongTon</td>
+                            <td>
+                                @if (item.SoLuongTon > 50)
+                                {
+                                    <span class="status-badge status-safe">An toàn</span>
+                                }
+                                else if (item.SoLuongTon > 10)
+                                {
+                                    <span class="status-badge status-warning">Sắp hết</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-critical">Nguy cấp</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="#" class="text-primary me-3 text-decoration-none"><i class="bi bi-pencil"></i></a>
+                                <a href="#" class="text-danger text-decoration-none"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
                     }
-                </td>
-                <td>@item.SoLuongTon</td>
-                <td>@item.HanSuDung.ToString("dd/MM/yyyy")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+                }
+                else
+                {
+                    <tr>
+                        <td class="fw-bold text-dark">MED-001</td>
+                        <td>Amoxicillin 500mg</td>
+                        <td>Kháng sinh</td>
+                        <td>120</td>
+                        <td><span class="status-badge status-safe">An toàn</span></td>
+                        <td class="text-end pe-4"><a href="#" class="text-primary me-3"><i class="bi bi-pencil"></i></a><a
+                            href="#" class="text-danger"><i class="bi bi-trash"></i></a></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-dark">MED-002</td>
+                            <td>Ibuprofen 400mg</td>
+                            <td>Giảm đau</td>
+                            <td>15</td>
+                            <td><span class="status-badge status-warning">Sắp hết</span></td>
+                            <td class="text-end pe-4"><a href="#" class="text-primary me-3"><i class="bi bi-pencil"></i></a><a
+                                href="#" class="text-danger"><i class="bi bi-trash"></i></a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

@@ -36,11 +36,11 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 // Định tuyến mặc định của MVC
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
-
 
 // ==========================================
 // 3. CHẠY ỨNG DỤNG

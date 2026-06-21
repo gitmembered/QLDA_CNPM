@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Lập Phiếu Nhập";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Lập Phiếu Nhập Kho</h3>
+    <p class="text-muted">Ghi nhận lô thuốc mới nhập từ nhà cung cấp.</p>
+</div>
+
+<div class="custom-card mb-4">
+    <h5 class="fw-bold mb-4 text-dark">Thông Tin Chung</h5>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <label class="form-label fw-medium text-dark fs-sm">Ngày nhập</label>
+            <input type="date" class="form-control bg-white text-muted" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-medium text-dark fs-sm">Nhà cung cấp</label>
+            <select class="form-select text-muted">
+                <option>Chọn nhà cung cấp...</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-medium text-dark fs-sm">Ghi chú</label>
+            <textarea class="form-control" rows="2" placeholder="Thêm ghi chú tại đây..."></textarea>
+        </div>
+    </div>
+</div>
+
+<div class="custom-card mb-4">
+    <h5 class="fw-bold mb-4 text-dark">Chi Tiết Nhập</h5>
+
+    <table class="table table-borderless mb-2">
+        <thead>
+            <tr class="text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                <th width="40%">TÊN THUỐC</th>
+                <th width="15%">ĐƠN VỊ TÍNH</th>
+                <th width="15%">SỐ LƯỢNG</th>
+                <th width="15%">ĐƠN GIÁ (VNĐ)</th>
+                <th width="10%">THÀNH TIỀN</th>
+                <th width="5%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" class="form-control" placeholder="VD: Amoxicillin 500mg"></td>
+                <td><select class="form-select text-muted">
+                    <option>Chọn..</option>
+                    <option>Hộp</option>
+                    <option>Vỉ</option>
+                </select></td>
+                <td><input type="number" class="form-control" value="0"></td>
+                <td><input type="number" class="form-control" value="0"></td>
+                <td class="align-middle fw-bold">0 đ</td>
+                <td class="align-middle text-end"><i class="bi bi-trash text-danger cursor-pointer"></i></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+        <button class="btn btn-outline-primary bg-white btn-sm px-3 fw-medium" style="border-radius: 8px;">
+            <i class="bi bi-plus me-1"></i> Thêm Dòng
+        </button>
+        <div class="fs-5">
+            <span class="text-muted me-2 fs-6">Tổng cộng:</span>
+            <span class="fw-bold text-dark">0 đ</span>
+        </div>
+    </div>
+</div>
+
+<div class="text-end">
+    <button class="btn btn-primary px-4 py-2 fw-medium shadow-sm" style="border-radius: 8px;">
+        <i class="bi bi-floppy me-2"></i>Lưu & Xác nhận
+    </button>
+</div>

@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Tổng Quan";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Tổng Quan Hệ Thống</h3>
+    <p class="text-muted">Chào mừng trở lại. Dưới đây là tình hình kho thuốc hôm nay.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="custom-card">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="text-muted fw-medium">Tổng Mã Thuốc</span>
+                <div class="bg-primary bg-opacity-10 text-primary rounded p-2"><i class="bi bi-box-seam"></i></div>
+            </div>
+            <h3 class="fw-bold mb-1">2,451</h3>
+            <small class="text-success fw-bold">+12% so với tháng trước</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="text-muted fw-medium">Cảnh Báo Sắp Hết Hàng</span>
+                <div class="bg-danger bg-opacity-10 text-danger rounded p-2"><i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-0">14</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="text-muted fw-medium">Thuốc Sắp Hết Hạn</span>
+                <div class="bg-primary bg-opacity-10 text-primary rounded p-2"><i class="bi bi-clock"></i></div>
+            </div>
+            <h3 class="fw-bold mb-0">8</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="text-muted fw-medium">Tổng Giá Trị Kho</span>
+                <div class="bg-success bg-opacity-10 text-success rounded p-2"><i class="bi bi-cash-stack"></i></div>
+            </div>
+            <h3 class="fw-bold mb-0">124.500.000 đ</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="custom-card h-100">
+            <h5 class="fw-bold mb-4">Số Lượng Thuốc Theo Nhóm Bệnh</h5>
+            <div class="d-flex align-items-end justify-content-around mt-5"
+                 style="height: 200px; border-bottom: 1px dashed #E5E7EB; border-left: 1px dashed #E5E7EB; padding-bottom: 0;">
+                <div class="bg-primary rounded-top" style="width: 40px; height: 60%;" title="Hô hấp"></div>
+                <div class="bg-primary rounded-top" style="width: 40px; height: 40%;" title="Tiêu hóa"></div>
+                <div class="bg-primary rounded-top" style="width: 40px; height: 90%;" title="Thần kinh"></div>
+                <div class="bg-primary rounded-top" style="width: 40px; height: 30%;" title="Tim mạch"></div>
+                <div class="bg-primary rounded-top" style="width: 40px; height: 20%;" title="Xương khớp"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="custom-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Cảnh Báo Gần Đây</h5>
+                <a href="#" class="text-decoration-none text-primary fs-sm fw-medium">Xem tất cả</a>
+            </div>
+
+            <div class="d-flex mb-3">
+                <div class="mt-1 me-3 text-danger"><i class="bi bi-circle-fill" style="font-size: 8px;"></i></div>
+                <div>
+                    <div class="fw-medium text-dark">Amoxicillin sắp hết hàng nghiêm trọng</div>
+                    <small class="text-muted">10 phút trước</small>
+                </div>
+            </div>
+            <div class="d-flex mb-3">
+                <div class="mt-1 me-3 text-warning"><i class="bi bi-circle-fill" style="font-size: 8px;"></i></div>
+                <div>
+                    <div class="fw-medium text-dark">Ibuprofen hết hạn trong 30 ngày</div>
+                    <small class="text-muted">1 giờ trước</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
