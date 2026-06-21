@@ -51,6 +51,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/QLDA_CNPM/QLThuocBenhVien/Views/Thuoc/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGh1b2NcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/QLDA_CNPM/QLThuocBenhVien/Views/Thuoc/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGh1b2NcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/QLDA_CNPM/QLThuocBenhVien/Views/Thuoc/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGh1b2NcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
