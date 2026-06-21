@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using QLThuocBenhVien.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using QLThuocBenhVien.Models;
+using System.Security.Claims;
+
 namespace QLThuocBenhVien.Controllers
 {
     public class ThuocController : Controller
@@ -34,6 +36,7 @@ namespace QLThuocBenhVien.Controllers
             var danhSachThuoc = await query.ToListAsync();
             return View(danhSachThuoc);
         }
+
         // ==========================================
         // 1. CHỨC NĂNG THÊM MỚI (CREATE)
         // ==========================================
@@ -53,6 +56,18 @@ namespace QLThuocBenhVien.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(thuoc);
+
+                // --- BỔ SUNG GHI LOG ---
+                var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
+                _context.NhatKyHeThong.Add(new NhatKyHeThong
+                {
+                    ThoiGian = DateTime.Now,
+                    Loai = "Info",
+                    NoiDung = $"Thêm mới thuốc vào kho: {thuoc.TenThuoc}",
+                    NguoiThucHien = nguoiDung
+                });
+                // -----------------------
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -88,6 +103,18 @@ namespace QLThuocBenhVien.Controllers
                 try
                 {
                     _context.Update(thuoc);
+
+                    // --- BỔ SUNG GHI LOG ---
+                    var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
+                    _context.NhatKyHeThong.Add(new NhatKyHeThong
+                    {
+                        ThoiGian = DateTime.Now,
+                        Loai = "Warning",
+                        NoiDung = $"Cập nhật thông tin thuốc: {thuoc.TenThuoc}",
+                        NguoiThucHien = nguoiDung
+                    });
+                    // -----------------------
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -110,7 +137,20 @@ namespace QLThuocBenhVien.Controllers
             var thuoc = await _context.Thuoc.FindAsync(id);
             if (thuoc != null)
             {
+                var tenThuocDaXoa = thuoc.TenThuoc; // Lưu lại tên để ghi log
                 _context.Thuoc.Remove(thuoc);
+
+                // --- BỔ SUNG GHI LOG ---
+                var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
+                _context.NhatKyHeThong.Add(new NhatKyHeThong
+                {
+                    ThoiGian = DateTime.Now,
+                    Loai = "Danger",
+                    NoiDung = $"Đã xóa thuốc khỏi hệ thống: {tenThuocDaXoa}",
+                    NguoiThucHien = nguoiDung
+                });
+                // -----------------------
+
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));

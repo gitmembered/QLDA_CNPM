@@ -12,6 +12,8 @@ namespace QLThuocBenhVien.Data
         public DbSet<ThuocNhomBenh> ThuocNhomBenh { get; set; }
         public DbSet<NhaCungCap> NhaCungCap { get; set; }
         public DbSet<DonViTinh> DonViTinh { get; set; }
+        public DbSet<TaiKhoan> TaiKhoan { get; set; }
+        public DbSet<NhatKyHeThong> NhatKyHeThong { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

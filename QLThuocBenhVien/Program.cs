@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QLThuocBenhVien.Data;
 using System.Text.Json.Serialization; // Điểm thêm 1: Khai báo thư viện xử lý JSON
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,12 @@ builder.Services.AddControllersWithViews()
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
-
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Đường dẫn bị đẩy về nếu chưa đăng nhập
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Đường dẫn khi không đủ quyền
+    });
 // Điểm thêm 3: Cấu hình CORS (Cho phép mọi thiết bị, tên miền khác truy cập API)
 builder.Services.AddCors(options =>
 {
@@ -49,8 +55,10 @@ app.UseRouting();
 
 // Điểm thêm 4: Bật CORS (Lưu ý bắt buộc phải đặt ở giữa UseRouting và UseAuthorization)
 app.UseCors("AllowAll");
-
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapStaticAssets();
 
