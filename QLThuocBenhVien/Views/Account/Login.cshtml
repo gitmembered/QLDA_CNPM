@@ -1,0 +1,96 @@
+@{
+    Layout = null; // Không dùng Layout gốc
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login - PharmaDash</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+            .split-screen {
+                display: flex;
+                height: 100vh;
+            }
+
+            .left-panel {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 10%;
+                background: white;
+            }
+
+            .right-panel {
+                flex: 1;
+                background-image: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop');
+                background-size: cover;
+                background-position: center;
+            }
+
+            .login-form {
+                max-width: 400px;
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            .form-control {
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid #E5E7EB;
+            }
+
+            .btn-login {
+                background-color: #2563EB;
+                border: none;
+                padding: 12px;
+                border-radius: 8px;
+                font-weight: 600;
+                width: 100%;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="split-screen">
+        <div class="left-panel">
+            <div class="login-form">
+                <div class="mb-5 d-flex align-items-center">
+                    <i class="bi bi-capsule text-primary me-2 fs-3"></i>
+                    <span class="fs-4 fw-bold">PharmaDash</span>
+                </div>
+                <h2 class="fw-bold mb-2">Chào mừng trở lại</h2>
+                <p class="text-muted mb-4">Vui lòng nhập thông tin để truy cập hệ thống.</p>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger py-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @ViewBag.ErrorMessage
+                    </div>
+                }
+
+                <form asp-controller="Account" asp-action="Login" method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark fs-sm">Tên đăng nhập</label>
+                        <input type="text" name="username" class="form-control" placeholder="Nhập tài khoản" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark fs-sm">Mật khẩu</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        <div class="text-end mt-2">
+                            <a href="#" class="text-decoration-none text-primary fw-medium"
+                               style="font-size: 0.9rem;">Quên mật khẩu?</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login">Đăng Nhập</button>
+                </form>
+            </div>
+        </div>
+        <div class="right-panel"></div>
+    </div>
+</body>
+
+</html>
+
