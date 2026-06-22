@@ -230,16 +230,16 @@
                class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Thuoc" ? "active" : "") text-decoration-none">
                 <i class="bi bi-box-seam nav-icon"></i> Quản Lý Kho
             </a>
-            <a href="@Url.Action("Index", "PhieuNhap")"
-               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuNhap" && ViewContext.RouteData.Values["Action"]?.ToString() != "Create" ? "active" : "") text-decoration-none">
-                <i class="bi bi-journal-text nav-icon"></i> Lịch Sử Nhập Kho
-            </a>
 
+            
             <a href="@Url.Action("Create", "PhieuNhap")"
                class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuNhap" && ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "") text-decoration-none">
                 <i class="bi bi-file-earmark-plus nav-icon"></i> Lập Phiếu Nhập
             </a>
-
+            <a href="@Url.Action("Create", "PhieuXuat")"
+               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuXuat" && ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "") text-decoration-none">
+                <i class="bi bi-box-arrow-up nav-icon"></i> Lập Phiếu Xuất
+            </a>
             <hr class="text-secondary my-2 mx-3">
 
             @if (User.IsInRole("Admin") || User.IsInRole("QuanLy"))
@@ -247,6 +247,10 @@
                 <a href="@Url.Action("Index", "PhieuXuat")"
                    class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuXuat" && ViewContext.RouteData.Values["Action"]?.ToString() != "Create" ? "active" : "") text-decoration-none">
                     <i class="bi bi-journal-minus nav-icon"></i> Lịch Sử Xuất Kho
+                </a>
+                <a href="@Url.Action("Index", "PhieuNhap")"
+                   class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuNhap" && ViewContext.RouteData.Values["Action"]?.ToString() != "Create" ? "active" : "") text-decoration-none">
+                    <i class="bi bi-journal-text nav-icon"></i> Lịch Sử Nhập Kho
                 </a>
             }
             @if (User.IsInRole("Admin") || User.IsInRole("QuanLy"))
@@ -256,10 +260,7 @@
                     <i class="bi bi-bar-chart-line nav-icon"></i> Báo Cáo Thống Kê
                 </a>
             }
-            <a href="@Url.Action("Create", "PhieuXuat")"
-               class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuXuat" && ViewContext.RouteData.Values["Action"]?.ToString() == "Create" ? "active" : "") text-decoration-none">
-                <i class="bi bi-box-arrow-up nav-icon"></i> Lập Phiếu Xuất
-            </a>
+
         </div>
         <div class="sidebar-footer">
             <a href="@Url.Action("Index", "Settings")"
@@ -307,14 +308,21 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2"
                         aria-labelledby="notificationDropdown" style="width: 320px; font-size: 0.9rem;"
                         id="notificationList">
+
                         <li class="p-2 border-bottom d-flex justify-content-between align-items-center">
                             <h6 class="fw-bold mb-0 text-dark">Thông báo kho mới nhất <span
                                 class="badge bg-danger ms-1">@tongThongBao</span></h6>
+                                @if (tongThongBao > 0)
+                                {
+                                    <button
+                                    class="btn btn-sm btn-link text-danger text-decoration-none p-0 fw-medium shadow-none"
+                                    id="clearAllNotifications" style="font-size: 0.8rem;">Xóa tất cả</button>
+                                }
                             </li>
 
                             @if (tongThongBao == 0)
                             {
-                                <li class="p-4 text-center text-muted">
+                                <li class="p-4 text-center text-muted empty-noti">
                                     <i class="bi bi-check2-circle fs-3 text-success d-block mb-1"></i>
                                     Hệ thống ổn định, không có cảnh báo nào!
                                 </li>
@@ -331,10 +339,11 @@
                                                                                        style="font-size: 8px;"></i></span>
                                                     <div>
                                                         <div class="fw-semibold text-dark">@t.TenThuoc sắp hết hạn!</div>
-                                                        <small class="text-muted">Hạn sử dụng:
-                                                            @t.HanSuDung.ToString("dd/MM/yyyy").</small>
-                                                        </div>
-                                                    </a>
+                                                        <small class="text-muted">Hạn dùng: @t.HanSuDung.ToString("dd/MM/yyyy").</small>
+                                                    </div>
+                                                </a>
+                                                <button class="btn btn-sm text-muted p-1 ms-1 btn-remove-noti border-0 shadow-none"><i
+                                                    class="bi bi-x-lg"></i></button>
                                                 </div>
                                             </li>
                                         }
@@ -349,10 +358,11 @@
                                                                                               style="font-size: 8px;"></i></span>
                                                             <div>
                                                                 <div class="fw-semibold text-dark">@t.TenThuoc sắp hết hàng!</div>
-                                                                <small class="text-muted">Số lượng tồn kho hiện tại chỉ còn: @t.SoLuongTon
-                                                                    @t.DonViTinh.</small>
-                                                                </div>
-                                                            </a>
+                                                                <small class="text-muted">Tồn kho hiện tại: @t.SoLuongTon @t.DonViTinh.</small>
+                                                            </div>
+                                                        </a>
+                                                        <button class="btn btn-sm text-muted p-1 ms-1 btn-remove-noti border-0 shadow-none"><i
+                                                            class="bi bi-x-lg"></i></button>
                                                         </div>
                                                     </li>
                                                 }
@@ -413,11 +423,13 @@
                             if (items.length === 0) {
                             if (badge) badge.style.display = 'none'; // Ẩn chấm đỏ
 
-                            // Hiển thị chữ "Không có thông báo"
+                            // Hiển thị chữ "Đã đọc hết thông báo" siêu xịn
+                            if (!notiList.querySelector('.empty-noti')) {
                             const emptyLi = document.createElement('li');
                             emptyLi.className = 'p-4 text-center text-muted empty-noti';
-                            emptyLi.innerHTML = '<i class="bi bi-bell-slash fs-3 d-block mb-2 text-secondary"></i><small>Không có thông báo mới.</small>';
+                            emptyLi.innerHTML = '<i class="bi bi-check2-circle fs-3 text-success d-block mb-2"></i><small>Đã đọc hết thông báo.</small>';
                             notiList.insertBefore(emptyLi, document.getElementById('noti-divider'));
+                            }
 
                             // Ẩn nút Xóa tất cả
                             if (clearAllBtn) clearAllBtn.style.display = 'none';
@@ -425,7 +437,7 @@
                             }
 
                             if (notiList) {
-                            // Xóa từng thông báo
+                            // Xóa từng thông báo với hiệu ứng Fade-out
                             notiList.addEventListener('click', function (e) {
                             const removeBtn = e.target.closest('.btn-remove-noti');
                             if (removeBtn) {
@@ -433,21 +445,39 @@
                             e.stopPropagation(); // Giữ menu không bị đóng
                             const item = removeBtn.closest('.notification-item');
                             if (item) {
+                            // Thêm hiệu ứng mờ dần trong 0.3s
+                            item.style.transition = "opacity 0.3s ease";
+                            item.style.opacity = "0";
+
+                            // Đợi hiệu ứng chạy xong rồi mới xóa element
+                            setTimeout(() => {
                             item.remove();
                             checkEmptyNotifications();
+                            }, 300);
                             }
                             }
                             });
                             }
 
-                            // Xóa tất cả thông báo
+                            // Xóa tất cả thông báo với hiệu ứng Slide-out
                             if (clearAllBtn) {
                             clearAllBtn.addEventListener('click', function (e) {
                             e.preventDefault();
                             e.stopPropagation(); // Giữ menu không bị đóng
                             const items = notiList.querySelectorAll('.notification-item');
+
+                            // Thêm hiệu ứng trượt ngang và mờ dần cho tất cả
+                            items.forEach(item => {
+                            item.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+                            item.style.opacity = "0";
+                            item.style.transform = "translateX(20px)";
+                            });
+
+                            // Đợi 0.3s cho hoạt ảnh hoàn tất
+                            setTimeout(() => {
                             items.forEach(item => item.remove());
                             checkEmptyNotifications();
+                            }, 300);
                             });
                             }
                             });

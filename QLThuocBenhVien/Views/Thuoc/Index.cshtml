@@ -156,45 +156,53 @@
                                                 }
                                             </td>
                                             <td class="fw-bold">@item.SoLuongTon</td>
+
                                             <td>
-                                                @if (item.SoLuongTon > 50)
+                                                @if (item.SoLuongTon == 0)
                                                 {
-                                                    <span class="status-badge status-safe"><i class="bi bi-check-circle me-1"></i>An toàn</span>
+                                                    <span class="status-badge status-critical"><i class="bi bi-x-octagon me-1"></i>Hết hàng</span>
                                                 }
-                                                else if (item.SoLuongTon > 0)
+                                                else if (item.HanSuDung != DateTime.MinValue && item.HanSuDung <= DateTime.Now.AddDays(30))
                                                 {
-                                                    <span class="status-badge status-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sắp
-                                                        hết</span>
+                                                    <span class="status-badge status-warning"><i class="bi bi-clock-history me-1"></i>Sắp hết
+                                                        hạn</span>
                                                     }
-                                else
+                                                else if (item.SoLuongTon <= 50)
                                                     {
-                                                        <span class="status-badge status-critical"><i class="bi bi-x-octagon me-1"></i>Hết hàng</span>
-                                                    }
-                                                </td>
-                                                <td class="text-end pe-4">
-                                                    <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-primary me-2"
-                                                       title="Chỉnh sửa">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-danger"
-                                                       title="Xóa"
-                                                       onclick="return confirm('Bạn có chắc chắn muốn xóa thuốc @item.TenThuoc khỏi hệ thống?');">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
+                                                        <span class="status-badge status-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sắp hết
+                                                            hàng</span>
+                                                        }
+                                                else
+                                                        {
+                                                            <span class="status-badge status-safe"><i class="bi bi-check-circle me-1"></i>An toàn</span>
+                                                        }
+                                                    </td>
+
+                                                    <td class="text-end pe-4">
+                                                        <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-primary me-2"
+                                                           title="Chỉnh sửa">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                        <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-danger"
+                                                           title="Xóa"
+                                                           onclick="return confirm('Bạn có chắc chắn muốn xóa thuốc @item.TenThuoc khỏi hệ thống?');">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                else
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center py-5 text-muted">
+                                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                                    Không tìm thấy loại thuốc nào phù hợp với điều kiện lọc.
                                                 </td>
                                             </tr>
                                         }
-                                    }
-                else
-                                    {
-                                        <tr>
-                                            <td colspan="6" class="text-center py-5 text-muted">
-                                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                                Không tìm thấy loại thuốc nào phù hợp với điều kiện lọc.
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> ```
+

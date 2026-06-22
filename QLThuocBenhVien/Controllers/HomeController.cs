@@ -119,7 +119,13 @@ namespace QLThuocBenhVien.Controllers
             }
 
             // Gộp lại, sắp xếp theo thời gian mới nhất và lấy 6 cái
-            ViewBag.ThongBaoGanDay = thongBaoList.OrderByDescending(x => x.ThoiGian).Take(6).ToList();
+            var danhSachSapXep = thongBaoList.OrderByDescending(x => x.ThoiGian).ToList();
+
+            // Gửi toàn bộ danh sách vào ViewBag này để dùng cho Modal "Xem tất cả"
+            ViewBag.TatCaThongBao = danhSachSapXep;
+
+            // Chỉ lấy 3 cái hiển thị ngoài màn hình chính Dashboard
+            ViewBag.ThongBaoGanDay = danhSachSapXep.Take(3).ToList();
 
             return View();
         }

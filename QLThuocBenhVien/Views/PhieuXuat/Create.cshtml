@@ -29,7 +29,14 @@
                         <option value="4">Khoa Cấp Cứu (Khoa 4)</option>
                     </select>
                 </div>
-                <div class="col-md-8">
+
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-dark">Thời gian xuất <span class="text-danger">*</span></label>
+                    <input type="datetime-local" name="NgayXuat" class="form-control shadow-none"
+                           value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+
+                <div class="col-md-5">
                     <label class="form-label fw-bold text-dark">Lý do xuất kho / Ghi chú</label>
                     <input type="text" name="LyDoXuat" class="form-control shadow-none"
                            placeholder="Ví dụ: Cấp phát thuốc định kỳ tuần..." required />
