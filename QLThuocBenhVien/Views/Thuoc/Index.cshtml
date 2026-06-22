@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<QLThuocBenhVien.Models.Thuoc>
 @{
-    ViewData["Title"] = "Inventory";
+    ViewData["Title"] = "Danh Mục Kho Thuốc";
 }
 
 <style>
@@ -10,14 +10,13 @@
         color: #6B7280;
         font-size: 0.85rem;
         padding: 15px;
-        background: white;
+        background: transparent;
     }
 
     .table td {
         vertical-align: middle;
         padding: 15px;
         border-bottom: 1px solid #E5E7EB;
-        color: #374151;
         font-weight: 500;
     }
 
@@ -42,6 +41,22 @@
         background-color: #FDE8E8;
         color: #9B1C1C;
     }
+
+    /* Fix nền dropdown khi ở chế độ tối */
+    [data-bs-theme="dark"] .status-safe {
+        background-color: rgba(3, 84, 63, 0.3);
+        color: #31C48D;
+    }
+
+    [data-bs-theme="dark"] .status-warning {
+        background-color: rgba(146, 64, 14, 0.3);
+        color: #FACA15;
+    }
+
+    [data-bs-theme="dark"] .status-critical {
+        background-color: rgba(155, 28, 28, 0.3);
+        color: #F87171;
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -56,105 +71,130 @@
 </div>
 
 <div class="custom-card p-0 overflow-hidden">
-    <div class="p-4 border-bottom" style="background-color: #F9FAFB;">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control border-start-0 ps-0 shadow-none"
-                           placeholder="Tìm kiếm thuốc theo tên hoặc mã...">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select text-muted">
-                    <option>Tất cả nhóm bệnh</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select class="form-select text-muted">
-                    <option>Tất cả trạng thái</option>
-                </select>
-            </div>
-        </div>
-    </div>
 
-    <div class="table-responsive">
-        <table class="table mb-0">
-            <thead>
-                <tr>
-                    <th>Mã</th>
-                    <th>Tên Thuốc</th>
-                    <th>Nhóm Bệnh</th>
-                    <th>Tồn Kho</th>
-                    <th>Trạng Thái</th>
-                    <th class="text-end pe-4">Thao Tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="fw-bold text-dark">MED-@item.MaThuoc.ToString("D3")</td>
-                            <td>@item.TenThuoc</td>
-                            <td>
-                                @if (item.ThuocNhomBenhs.Any())
+    <div class="p-4 border-bottom bg-light">
+        <form method="get" asp-action="Index" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0 text-muted"><i
+                            class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" value="@ViewData["CurrentSearch"]"
+                                   class="form-control border-start-0 ps-0 shadow-none bg-transparent"
+                                   placeholder="Tìm kiếm thuốc theo tên..."
+                                   onkeypress="if(event.keyCode==13){ this.form.submit(); }">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="maNhomBenh" class="form-select shadow-none" asp-items="ViewBag.NhomBenhList"
+                                onchange="document.getElementById('filterForm').submit();">
+                            <option value="">Tất cả nhóm bệnh</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="trangThai" class="form-select shadow-none"
+                                onchange="document.getElementById('filterForm').submit();">
+                            <option value="">Tất cả trạng thái</option>
+                            @if (ViewData["CurrentTrangThai"]?.ToString() == "AnToan")
+                            {
+                                <option value="AnToan" selected>An
+                                    toàn (> 50)</option>
+                                } else
                                 {
-                                    @item.ThuocNhomBenhs.First().NhomBenh.TenNhomBenh
+
+                                    <option value="AnToan">An toàn (> 50)</option>
                                 }
-                            </td>
-                            <td>@item.SoLuongTon</td>
-                            <td>
-                                @if (item.SoLuongTon > 50)
+                                @if (ViewData["CurrentTrangThai"]?.ToString() == "SapHet")
                                 {
-                                    <span class="status-badge status-safe">An toàn</span>
-                                }
-                                else if (item.SoLuongTon > 10)
+                                    <option value="SapHet" selected>Sắp
+                                        hết hàng (1 - 50)</option>
+                                    } else
+                                    {
+
+                                        <option value="SapHet">Sắp hết hàng (1 - 50)</option>
+                                    }
+                                    @if (ViewData["CurrentTrangThai"]?.ToString() == "HetHang")
+                                    {
+                                        <option value="HetHang" selected>
+                                            Hết hàng (0)</option>
+                                        } else
+                                        {
+
+                                            <option value="HetHang">Hết hàng (0)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4">Mã</th>
+                                    <th>Tên Thuốc</th>
+                                    <th>Nhóm Bệnh</th>
+                                    <th>Tồn Kho</th>
+                                    <th>Trạng Thái</th>
+                                    <th class="text-end pe-4">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
                                 {
-                                    <span class="status-badge status-warning">Sắp hết</span>
-                                }
+                                    foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold text-primary ps-4">MED-@item.MaThuoc.ToString("D3")</td>
+                                            <td class="fw-bold text-dark">@item.TenThuoc</td>
+                                            <td>
+                                                @if (item.ThuocNhomBenhs != null && item.ThuocNhomBenhs.Any())
+                                                {
+                                                    <span
+                                                    class="badge bg-secondary-subtle text-secondary">@item.ThuocNhomBenhs.First().NhomBenh.TenNhomBenh</span>
+                                                }
+                                            </td>
+                                            <td class="fw-bold">@item.SoLuongTon</td>
+                                            <td>
+                                                @if (item.SoLuongTon > 50)
+                                                {
+                                                    <span class="status-badge status-safe"><i class="bi bi-check-circle me-1"></i>An toàn</span>
+                                                }
+                                                else if (item.SoLuongTon > 0)
+                                                {
+                                                    <span class="status-badge status-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sắp
+                                                        hết</span>
+                                                    }
                                 else
-                                {
-                                    <span class="status-badge status-critical">Nguy cấp</span>
-                                }
-                            </td>
-                            <td class="text-end pe-4">
-                                <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="text-primary me-3 text-decoration-none"
-                                   title="Chỉnh sửa">
-                                    <i class="bi bi-pencil fs-5"></i>
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="text-danger text-decoration-none"
-                                   title="Xóa"
-                                   onclick="return confirm('Bạn có chắc chắn muốn xóa loại thuốc này khỏi hệ thống?');">
-                                    <i class="bi bi-trash fs-5"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                }
+                                                    {
+                                                        <span class="status-badge status-critical"><i class="bi bi-x-octagon me-1"></i>Hết hàng</span>
+                                                    }
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-primary me-2"
+                                                       title="Chỉnh sửa">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-danger"
+                                                       title="Xóa"
+                                                       onclick="return confirm('Bạn có chắc chắn muốn xóa thuốc @item.TenThuoc khỏi hệ thống?');">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
                 else
-                {
-                    <tr>
-                        <td class="fw-bold text-dark">MED-001</td>
-                        <td>Amoxicillin 500mg</td>
-                        <td>Kháng sinh</td>
-                        <td>120</td>
-                        <td><span class="status-badge status-safe">An toàn</span></td>
-                        <td class="text-end pe-4"><a href="#" class="text-primary me-3"><i class="bi bi-pencil"></i></a><a
-                            href="#" class="text-danger"><i class="bi bi-trash"></i></a></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-dark">MED-002</td>
-                            <td>Ibuprofen 400mg</td>
-                            <td>Giảm đau</td>
-                            <td>15</td>
-                            <td><span class="status-badge status-warning">Sắp hết</span></td>
-                            <td class="text-end pe-4"><a href="#" class="text-primary me-3"><i class="bi bi-pencil"></i></a><a
-                                href="#" class="text-danger"><i class="bi bi-trash"></i></a></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5 text-muted">
+                                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                                Không tìm thấy loại thuốc nào phù hợp với điều kiện lọc.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>

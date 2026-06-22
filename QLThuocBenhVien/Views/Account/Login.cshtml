@@ -64,6 +64,13 @@
                 <h2 class="fw-bold mb-2">Chào mừng trở lại</h2>
                 <p class="text-muted mb-4">Vui lòng nhập thông tin để truy cập hệ thống.</p>
 
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success py-2 mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+
                 @if (ViewBag.ErrorMessage != null)
                 {
                     <div class="alert alert-danger py-2 mb-4" role="alert">
@@ -80,11 +87,17 @@
                         <label class="form-label fw-bold text-dark fs-sm">Mật khẩu</label>
                         <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                         <div class="text-end mt-2">
-                            <a href="#" class="text-decoration-none text-primary fw-medium"
+                            <a asp-action="ForgotPassword" class="text-decoration-none text-primary fw-medium"
                                style="font-size: 0.9rem;">Quên mật khẩu?</a>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-login">Đăng Nhập</button>
+
+                    <button type="submit" class="btn btn-primary btn-login mb-4">Đăng Nhập</button>
+
+                    <div class="text-center text-muted" style="font-size: 0.9rem;">
+                        Chưa có tài khoản? <a asp-action="Register"
+                                              class="text-decoration-none fw-bold text-primary">Đăng ký ngay</a>
+                    </div>
                 </form>
             </div>
         </div>
@@ -93,4 +106,3 @@
 </body>
 
 </html>
-

@@ -25,7 +25,8 @@ namespace QLThuocBenhVien.Models
         [StringLength(20)]
         public string VaiTro { get; set; } // 'Admin', 'BacSi', 'DuocSi', 'QuanLy'
 
-        public bool? TrangThai { get; set; } // 1: Hoạt động, 0: Bị khóa
+        // Thay đổi kiểu dữ liệu thành int
+        public int TrangThai { get; set; }
         [StringLength(255)]
         public string? Avatar { get; set; } // Thêm dấu ? để cho phép null
     }

@@ -223,3 +223,11 @@ C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\refint\QLThuocBenhVien.dll
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.pdb
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.genruntimeconfig.cache
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\ref\QLThuocBenhVien.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ExcelNumberFormat.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\RBush.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\SixLabors.Fonts.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.IO.Packaging.dll

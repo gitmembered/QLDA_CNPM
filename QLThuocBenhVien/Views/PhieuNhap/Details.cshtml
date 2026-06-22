@@ -1,0 +1,83 @@
+@model QLThuocBenhVien.Models.PhieuNhap
+@{
+    ViewData["Title"] = "Chi Tiết Phiếu Nhập";
+}
+
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h3 class="fw-bold mb-1">Chi Tiết Phiếu Nhập Kho</h3>
+        <p class="text-muted">Thông tin chứng từ hóa đơn và danh mục danh sách hàng nhập.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-light fw-medium"><i class="bi bi-arrow-left me-2"></i>Quay lại danh sách</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="custom-card h-100">
+            <h5 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-receipt me-2 text-primary"></i>Chứng
+                từ gốc</h5>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block mb-1">Số chứng từ</label>
+                    <div class="p-2.5 bg-light roundedfw-bold text-primary fs-5">#PN-@Model.MaPN.ToString("D4")</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block mb-1">Nhà cung ứng đối tác</label>
+                    <div class="p-2.5 bg-light rounded text-dark fw-medium">@Model.NhaCungCap?.TenNCC</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block mb-1">Thời gian nhập kho</label>
+                    <div class="p-2.5 bg-light rounded text-muted">@Model.NgayNhap.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small d-block mb-1">Ghi chú diễn giải</label>
+                    <div class="p-2.5 bg-light rounded text-muted small">@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có dữ liệu ghi chú bổ sung." : Model.GhiChu)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="custom-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3"><i
+                        class="bi bi-box-seam me-2 text-primary"></i>Danh mục thuốc nhập</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>TÊN THUỐC</th>
+                                        <th class="text-center">ĐVT</th>
+                                        <th class="text-center">SỐ LƯỢNG</th>
+                                        <th class="text-end">ĐƠN GIÁ</th>
+                                        <th class="text-end">THÀNH TIỀN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ct in Model.ChiTietPhieuNhaps)
+                                    {
+                                        var thanhTien = ct.SoLuong * ct.DonGia;
+                                        <tr>
+                                            <td class="fw-bold text-dark">@ct.TenThuoc</td>
+                                            <td class="text-center"><span
+                                                class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded">@ct.DonViTinh?.TenDVT</span>
+                                            </td>
+                                            <td class="text-center fw-medium">@ct.SoLuong</td>
+                                            <td class="text-end text-muted">@ct.DonGia.ToString("N0") đ</td>
+                                            <td class="text-end fw-bold text-primary">@thanhTien.ToString("N0") đ</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top mt-4 d-flex justify-content-between align-items-center">
+                        <span class="fs-5 fw-bold text-dark">Tổng giá trị thanh toán:</span>
+                        <span class="fs-3 fw-bold text-danger">@Model.TongTien.ToString("N0") VNĐ</span>
+                    </div>
+                </div>
+            </div>
+        </div>

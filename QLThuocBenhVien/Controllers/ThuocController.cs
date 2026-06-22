@@ -16,23 +16,51 @@ namespace QLThuocBenhVien.Controllers
             _context = context;
         }
 
-        // GET: Hiển thị danh sách thuốc (có hỗ trợ lọc theo nhóm bệnh)
-        public async Task<IActionResult> Index(int? maNhomBenh)
+        // ==========================================
+        // GET: Hiển thị danh sách thuốc (Có Tìm kiếm & Lọc)
+        // ==========================================
+        public async Task<IActionResult> Index(string searchString, int? maNhomBenh, string trangThai)
         {
-            // Đổ dữ liệu ra Dropdown list để lọc
-            ViewBag.NhomBenhList = new SelectList(_context.NhomBenh, "MaNhomBenh", "TenNhomBenh");
+            // 1. Lưu lại các giá trị lọc để hiển thị giữ nguyên trên giao diện sau khi load lại
+            ViewData["CurrentSearch"] = searchString;
+            ViewData["CurrentNhomBenh"] = maNhomBenh;
+            ViewData["CurrentTrangThai"] = trangThai;
 
+            // 2. Đổ dữ liệu ra Dropdown list Nhóm bệnh
+            ViewBag.NhomBenhList = new SelectList(await _context.NhomBenh.ToListAsync(), "MaNhomBenh", "TenNhomBenh", maNhomBenh);
+
+            // 3. Lấy toàn bộ Query gốc
             var query = _context.Thuoc
                 .Include(t => t.ThuocNhomBenhs)
                 .ThenInclude(tnb => tnb.NhomBenh)
                 .AsQueryable();
 
+            // --- BẮT ĐẦU LỌC DỮ LIỆU ---
+
+            // A. Lọc theo Tên thuốc
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(t => t.TenThuoc.Contains(searchString));
+            }
+
+            // B. Lọc theo Nhóm bệnh
             if (maNhomBenh.HasValue)
             {
-                // Lọc những thuốc thuộc nhóm bệnh được chọn
                 query = query.Where(t => t.ThuocNhomBenhs.Any(tnb => tnb.MaNhomBenh == maNhomBenh));
             }
 
+            // C. Lọc theo Trạng thái (Dựa vào số lượng tồn kho thực tế)
+            if (!string.IsNullOrEmpty(trangThai))
+            {
+                if (trangThai == "HetHang")
+                    query = query.Where(t => t.SoLuongTon == 0);
+                else if (trangThai == "SapHet")
+                    query = query.Where(t => t.SoLuongTon > 0 && t.SoLuongTon <= 50); // Mức cảnh báo sắp hết là <= 50
+                else if (trangThai == "AnToan")
+                    query = query.Where(t => t.SoLuongTon > 50);
+            }
+
+            // Thực thi truy vấn và trả về
             var danhSachThuoc = await query.ToListAsync();
             return View(danhSachThuoc);
         }
@@ -43,7 +71,6 @@ namespace QLThuocBenhVien.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Đổ dữ liệu vào Dropdown chọn Nhà Cung Cấp và Đơn Vị Tính
             ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC");
             ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT");
             return View();

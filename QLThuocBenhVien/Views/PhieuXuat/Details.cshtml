@@ -1,0 +1,62 @@
+@model QLThuocBenhVien.Models.PhieuXuat
+@{
+    ViewData["Title"] = "Chi Tiết Phiếu Xuất";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Chứng Từ Xuất Kho</h3>
+        <p class="text-muted mb-0">Mã hóa đơn hệ thống cấp phát: #PX-@Model.MaPhieuXuat.ToString("D4")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-light"><i class="bi bi-arrow-left me-1"></i> Quay lại danh sách</a>
+        <a asp-action="ExportExcel" asp-route-id="@Model.MaPhieuXuat" class="btn btn-success fw-medium"><i
+            class="bi bi-file-earmark-excel me-1"></i> Xuất File Excel</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="custom-card p-4">
+                <h6 class="fw-bold text-primary mb-3">Thông tin tổng quát</h6>
+                <p class="mb-2 text-muted">Mã Khoa Nhận: <strong class="text-dark d-block">Khoa số @Model.MaKhoa</strong>
+                </p>
+                <p class="mb-2 text-muted">Thời gian xuất kho: <strong
+                    class="text-dark d-block">@Model.NgayXuat.ToString("dd/MM/yyyy HH:mm:ss")</strong></p>
+                    <p class="mb-0 text-muted">Lý do điều chuyển: <strong class="text-dark d-block">@Model.LyDoXuat</strong></p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="custom-card p-0 overflow-hidden">
+                    <div class="p-3 bg-light border-bottom fw-bold text-dark">Danh mục dược phẩm bàn giao</div>
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead>
+                                <tr class="table-light">
+                                    <th class="ps-3">Tên Thuốc</th>
+                                    <th>Số Lượng</th>
+                                    <th>Đơn Giá</th>
+                                    <th class="text-end pe-3">Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.ChiTietPhieuXuats)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-dark ps-3">@item.Thuoc.TenThuoc</td>
+                                        <td>@item.SoLuong</td>
+                                        <td>@item.DonGia.ToString("N0") đ</td>
+                                        <td class="text-end pe-3 fw-bold text-primary">@((item.SoLuong *
+                                                                            item.DonGia).ToString("N0")) đ</td>
+                                        </tr>
+                                    }
+                                    <tr class="table-light fw-bold fs-5 text-dark">
+                                        <td colspan="3" class="text-end ps-3">TỔNG GIÁ TRỊ:</td>
+                                        <td class="text-end pe-3 text-danger">@Model.TongTien.ToString("N0") VNĐ</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>

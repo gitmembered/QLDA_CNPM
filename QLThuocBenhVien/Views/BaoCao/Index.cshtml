@@ -1,0 +1,222 @@
+@{
+    ViewData["Title"] = "Báo Cáo Hệ Thống";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Báo cáo & Thống kê</h3>
+    <p class="text-muted mb-0">Giám sát tổng quan chỉ số tồn kho, dòng tiền biến động và tần suất sử dụng thuốc.</p>
+</div>
+
+<div class="custom-card p-4 mb-4">
+    <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-calendar-check me-2"></i>Trích xuất dữ liệu báo cáo sang Excel
+    </h5>
+    <form asp-action="ExportExcelReport" method="post">
+        @Html.AntiForgeryToken()
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-medium">Tên tiêu đề báo cáo</label>
+                <input type="text" name="tenBaoCao" class="form-control shadow-none" placeholder="Ví dụ: Báo cáo Quý 2"
+                       value="Báo cáo tổng hợp kho dược" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-medium">Từ ngày</label>
+                <input type="date" name="tuNgay" class="form-control shadow-none"
+                       value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-dark fw-medium">Đến ngày</label>
+                <input type="date" name="denNgay" class="form-control shadow-none"
+                       value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success w-100 fw-medium shadow-sm py-2">
+                    <i class="bi bi-file-earmark-excel me-2"></i>Tạo & Tải Báo Cáo
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+            <div>
+                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
+                    GIÁ TRỊ NHẬP</small>
+                    <h4 class="fw-bold text-success mb-0">@ViewBag.TongTienNhap.ToString("N0")đ</h4>
+                </div>
+                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-success-subtle text-success fs-3"
+                     style="width: 48px; height: 48px;">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
+                        GIÁ TRỊ XUẤT</small>
+                        <h4 class="fw-bold text-danger mb-0">@ViewBag.TongTienXuat.ToString("N0")đ</h4>
+                    </div>
+                    <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-danger-subtle text-danger fs-3"
+                         style="width: 48px; height: 48px;">
+                        <i class="bi bi-graph-down-arrow"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
+                            ĐẦU THUỐC</small>
+                            <h4 class="fw-bold text-primary mb-0">@ViewBag.TongSoThuoc loại</h4>
+                        </div>
+                        <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-primary-subtle text-primary fs-3"
+                             style="width: 48px; height: 48px;">
+                            <i class="bi bi-capsule"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">CẢNH
+                                BÁO TỒN KHO</small>
+                                <h4 class="fw-bold text-warning mb-0">@ViewBag.ThuocSapHet <span class="fs-6 text-muted">sắp hết /
+                                    @ViewBag.ThuocHetHang trống</span></h4>
+                                </div>
+                                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-warning-subtle text-warning fs-3"
+                                     style="width: 48px; height: 48px;">
+                                    <i class="bi bi-exclamation-octagon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-8">
+                            <div class="custom-card p-4">
+                                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-activity text-primary me-2"></i>Biến động giá trị xuất
+                                    kho 6 tháng qua</h5>
+                                    <div style="height: 320px; position: relative;">
+                                        <canvas id="lineChartTrend"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="custom-card p-4">
+                                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Top 5 thuốc cấp phát
+                                        nhiều nhất</h5>
+                                        <div style="height: 320px; position: relative;" class="d-flex align-items-center justify-content-center">
+                                            <canvas id="pieChartDrugs"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="custom-card p-0 overflow-hidden">
+                                <div class="p-4 border-bottom">
+                                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Lịch sử trích xuất báo
+                                        cáo gần đây</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table mb-0 align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="ps-4">Tên Báo Cáo</th>
+                                                    <th>Loại</th>
+                                                    <th>Giai Đoạn Dữ Liệu</th>
+                                                    <th>Ngày Trích Xuất</th>
+                                                    <th class="pe-4">Mã Tài Khoản Lập</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (ViewBag.LichSuBaoCao != null)
+                                                {
+                                                    foreach (var bc in ViewBag.LichSuBaoCao)
+                                                    {
+                                                        <tr>
+                                                            <td class="fw-bold text-dark ps-4">@bc.TenBaoCao</td>
+                                                            <td><span class="badge bg-info-subtle text-info">@bc.LoaiBaoCao</span></td>
+                                                            <td>@bc.TuNgay.ToString("dd/MM/yyyy") - @bc.DenNgay.ToString("dd/MM/yyyy")</td>
+                                                            <td>@bc.NgayLap.ToString("dd/MM/yyyy HH:mm")</td>
+                                                            <td class="pe-4">ID: @bc.MaTaiKhoan</td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                @section Scripts {
+                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                                        const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
+                                        const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
+                                        // ================= CONFIG 1: BIỂU ĐỒ ĐƯỜNG XU HƯỚNG =================
+                                        const xuHuongLabels = @Html.Raw(Json.Serialize(ViewBag.XuHuongLabels));
+                                        const xuHuongData = @Html.Raw(Json.Serialize(ViewBag.XuHuongData));
+
+                                        const ctxLine = document.getElementById('lineChartTrend').getContext('2d');
+                                        new Chart(ctxLine, {
+                                        type: 'line',
+                                        data: {
+                                        labels: xuHuongLabels,
+                                        datasets: [{
+                                        label: 'Giá trị xuất kho (VNĐ)',
+                                        data: xuHuongData,
+                                        borderColor: '#2563EB',
+                                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                        borderWidth: 3,
+                                        tension: 0.3,
+                                        fill: true,
+                                        pointBackgroundColor: '#2563EB'
+                                        }]
+                                        },
+                                        options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { display: false } },
+                                        scales: {
+                                        x: { ticks: { color: textColor }, grid: { display: false } },
+                                        y: {
+                                        ticks: { color: textColor, callback: value => value.toLocaleString('vi-VN') + ' đ' },
+                                        grid: { color: gridColor }
+                                        }
+                                        }
+                                        }
+                                        });
+
+                                        // ================= CONFIG 2: BIỂU ĐỒ TRÒN TOP THUỐC =================
+                                        const topThuocLabels = @Html.Raw(Json.Serialize(ViewBag.TopThuocLabels));
+                                        const topThuocData = @Html.Raw(Json.Serialize(ViewBag.TopThuocData));
+
+                                        const ctxPie = document.getElementById('pieChartDrugs').getContext('2d');
+                                        new Chart(ctxPie, {
+                                        type: 'doughnut',
+                                        data: {
+                                        labels: topThuocLabels,
+                                        datasets: [{
+                                        data: topThuocData,
+                                        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'],
+                                        borderWidth: isDarkMode ? 2 : 1,
+                                        borderColor: isDarkMode ? '#1f2937' : '#ffffff'
+                                        }]
+                                        },
+                                        options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                        legend: { position: 'bottom', labels: { color: textColor, padding: 15, font: { size: 12 } } }
+                                        }
+                                        }
+                                        });
+                                        });
+                                    </script>
+                                }

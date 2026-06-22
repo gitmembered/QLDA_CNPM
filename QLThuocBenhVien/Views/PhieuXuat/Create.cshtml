@@ -1,0 +1,222 @@
+@model QLThuocBenhVien.Models.PhieuXuat
+@{
+    ViewData["Title"] = "Lập Phiếu Xuất Kho";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Lập Phiếu Xuất Kho</h3>
+    <p class="text-muted">Xuất cấp phát thuốc từ kho tổng về cho các khoa ban chuyên môn.</p>
+</div>
+
+<form asp-action="Create" method="post" id="xuatkhoForm">
+    @Html.AntiForgeryToken()
+
+    <div class="custom-card p-4 mb-4">
+        <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Thông tin chứng từ chung</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold text-dark">Khoa lâm sàng nhận thuốc <span
+                    class="text-danger">*</span></label>
+                    <select name="MaKhoa" class="form-select shadow-none" required>
+                        <option value="">-- Chọn khoa ban nhận --</option>
+                        <option value="1">Khoa Nội Tổng Hợp (Khoa 1)</option>
+                        <option value="2">Khoa Ngoại Chấn Thương (Khoa 2)</option>
+                        <option value="3">Khoa Nhi (Khoa 3)</option>
+                        <option value="4">Khoa Cấp Cứu (Khoa 4)</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-bold text-dark">Lý do xuất kho / Ghi chú</label>
+                    <input type="text" name="LyDoXuat" class="form-control shadow-none"
+                           placeholder="Ví dụ: Cấp phát thuốc định kỳ tuần..." required />
+                </div>
+            </div>
+        </div>
+
+        <div class="custom-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-capsule me-2"></i>Danh mục thuốc xuất kho</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addDrugRow">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm dòng thuốc
+                </button>
+            </div>
+
+            <div class="table-responsive" style="overflow: visible;">
+                <table class="table align-middle" id="detailsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 45%">Tên Thuốc & Nhóm Bệnh</th>
+                            <th style="width: 15%">Số Lượng Xuất</th>
+                            <th style="width: 15%">Đơn Giá Xuất</th>
+                            <th style="width: 20%">Thành Tiền</th>
+                            <th style="width: 5%" class="text-center">#</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="drug-row">
+                            <td>
+                                <select name="chiTietList[0].MaThuoc" class="form-select drug-select shadow-none" required>
+                                    <option value="">-- Gõ tên thuốc hoặc nhóm bệnh để tìm --</option>
+                                    @foreach (var t in ViewBag.ThuocList)
+                                    {
+                                        // Kiểm tra xem thuốc có nằm trong nhóm bệnh nào không
+                                        string tenNhomBenh = t.ThuocNhomBenhs != null && t.ThuocNhomBenhs.Count > 0
+                                            ? t.ThuocNhomBenhs[0].NhomBenh.TenNhomBenh
+                                            : "Chưa phân nhóm";
+
+                                        // Ghép cả Tên thuốc và Nhóm bệnh vào Text để Select2 tự động quét được cả 2
+                                        <option value="@t.MaThuoc" data-price="@t.GiaBan">@t.TenThuoc - Nhóm: @tenNhomBenh (Tồn:
+                                            @t.SoLuongTon)</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="chiTietList[0].SoLuong" class="form-control drug-qty shadow-none"
+                                           min="1" value="1" required />
+                                </td>
+                                <td>
+                                    <input type="number" name="chiTietList[0].DonGia"
+                                           class="form-control drug-price shadow-none" readonly />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control drug-total shadow-none bg-light fw-bold text-dark"
+                                           value="0 đ" readonly />
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-link text-danger p-0 delete-row-btn shadow-none"><i
+                                        class="bi bi-trash fs-5"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end align-items-center mt-4 border-top pt-3">
+                        <div class="text-end">
+                            <span class="text-muted fw-medium me-2 fs-5">Tổng giá trị phiếu xuất:</span>
+                            <span class="fs-3 fw-bold text-danger" id="invoiceGrandTotal">0 VNĐ</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-light px-4">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-success px-4 fw-medium"><i class="bi bi-check2-circle me-2"></i>Lưu
+                            Phiếu Xuất Kho</button>
+                        </div>
+                    </div>
+                </form>
+
+                @section Scripts {
+                    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+                    <script>
+                        $(document).ready(function () {
+
+                        // Hàm khởi tạo công cụ tìm kiếm Select2
+                        function initSelect2(element) {
+                        element.select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        placeholder: '-- Gõ tên thuốc hoặc nhóm bệnh để tìm --'
+                        });
+                        }
+
+                        // Khởi tạo ngay cho dòng đầu tiên
+                        initSelect2($('.drug-select'));
+
+                        // Hàm tính toán tổng tiền
+                        function calculateTotals() {
+                        let grandTotal = 0;
+                        $('#detailsTable tbody .drug-row').each(function () {
+                        const row = $(this);
+                        const selectedOption = row.find('.drug-select option:selected');
+
+                        let price = 0;
+                        if (selectedOption.val() !== "") {
+                        price = parseFloat(selectedOption.attr('data-price')) || 0;
+                        row.find('.drug-price').val(price); // Tự điền giá
+                        }
+
+                        const qty = parseInt(row.find('.drug-qty').val()) || 0;
+                        const rowTotal = qty * price;
+                        grandTotal += rowTotal;
+
+                        row.find('.drug-total').val(rowTotal.toLocaleString('vi-VN') + " đ");
+                        });
+
+                        $('#invoiceGrandTotal').text(grandTotal.toLocaleString('vi-VN') + " VNĐ");
+                        }
+
+                        // Bắt sự kiện khi người dùng chọn một loại thuốc mới trong Select2
+                        $('#detailsTable').on('change', '.drug-select', function () {
+                        calculateTotals();
+                        });
+
+                        // Bắt sự kiện khi gõ số lượng
+                        $('#detailsTable').on('input', '.drug-qty', function () {
+                        calculateTotals();
+                        });
+
+                        // Thêm dòng mới
+                        $('#addDrugRow').click(function () {
+                        const index = $('#detailsTable tbody .drug-row').length;
+
+                        // Lấy toàn bộ mã HTML danh sách thuốc gốc (để copy sang dòng mới)
+                        const optionsHtml = $('#detailsTable tbody .drug-row:first .drug-select').html();
+
+                        const newRow = `
+                        <tr class="drug-row">
+                        <td>
+                        <select name="chiTietList[${index}].MaThuoc" class="form-select drug-select shadow-none" required>
+                        ${optionsHtml}
+                        </select>
+                        </td>
+                        <td>
+                        <input type="number" name="chiTietList[${index}].SoLuong" class="form-control drug-qty shadow-none" min="1" value="1" required />
+                        </td>
+                        <td>
+                        <input type="number" name="chiTietList[${index}].DonGia" class="form-control drug-price shadow-none" readonly />
+                        </td>
+                        <td>
+                        <input type="text" class="form-control drug-total shadow-none bg-light fw-bold text-dark" value="0 đ" readonly />
+                        </td>
+                        <td class="text-center">
+                        <button type="button" class="btn btn-link text-danger p-0 delete-row-btn shadow-none"><i class="bi bi-trash fs-5"></i></button>
+                        </td>
+                        </tr>
+                        `;
+
+                        $('#detailsTable tbody').append(newRow);
+
+                        // Khởi tạo công cụ tìm kiếm cho dòng vừa mới thêm
+                        const newSelect = $('#detailsTable tbody .drug-row:last .drug-select');
+                        initSelect2(newSelect);
+                        newSelect.val('').trigger('change'); // Đặt về trạng thái chưa chọn
+                        });
+
+                        // Xóa dòng
+                        $('#detailsTable').on('click', '.delete-row-btn', function () {
+                        const rows = $('#detailsTable tbody .drug-row');
+                        if (rows.length > 1) {
+                        $(this).closest('.drug-row').remove();
+
+                        // Cập nhật lại số thứ tự ID để gửi dữ liệu về Controller không bị đứt quãng
+                        $('#detailsTable tbody .drug-row').each(function (idx) {
+                        $(this).find('.drug-select').attr('name', `chiTietList[${idx}].MaThuoc`);
+                        $(this).find('.drug-qty').attr('name', `chiTietList[${idx}].SoLuong`);
+                        $(this).find('.drug-price').attr('name', `chiTietList[${idx}].DonGia`);
+                        });
+
+                        calculateTotals();
+                        } else {
+                        alert('Hóa đơn xuất kho bắt buộc phải có ít nhất một dược phẩm!');
+                        }
+                        });
+                        });
+                    </script>
+                }

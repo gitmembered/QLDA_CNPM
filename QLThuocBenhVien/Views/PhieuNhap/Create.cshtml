@@ -4,142 +4,158 @@
 
 <div class="mb-4">
     <h3 class="fw-bold mb-1">Lập Phiếu Nhập Kho</h3>
-    <p class="text-muted">Ghi nhận lô thuốc mới nhập từ nhà cung cấp.</p>
+    <p class="text-muted">Tạo phiếu nhập mới để thêm lô thuốc vào kho lưu trữ.</p>
 </div>
 
-<div class="custom-card mb-4">
-    <h5 class="fw-bold mb-4 text-dark">Thông Tin Chung</h5>
-    <div class="row g-4">
-        <div class="col-md-4">
-            <label class="form-label fw-medium text-dark fs-sm">Ngày nhập</label>
-            <input type="date" class="form-control bg-white text-muted" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-        </div>
-        <div class="col-md-4">
-            <label class="form-label fw-medium text-dark fs-sm">Nhà cung cấp</label>
-            <select class="form-select text-muted">
-                <option>Chọn nhà cung cấp...</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label fw-medium text-dark fs-sm">Ghi chú</label>
-            <textarea class="form-control" rows="2" placeholder="Thêm ghi chú tại đây..."></textarea>
-        </div>
-    </div>
-</div>
+<form asp-action="Create" method="post">
 
-<div class="custom-card mb-4">
-    <h5 class="fw-bold mb-4 text-dark">Chi Tiết Nhập</h5>
-
-    <table class="table table-borderless mb-2" id="chiTietTable">
-        <thead>
-            <tr class="text-muted" style="font-size: 0.75rem; letter-spacing: 0.5px;">
-                <th width="40%">TÊN THUỐC</th>
-                <th width="15%">ĐƠN VỊ TÍNH</th>
-                <th width="15%">SỐ LƯỢNG</th>
-                <th width="15%">ĐƠN GIÁ (VNĐ)</th>
-                <th width="10%">THÀNH TIỀN</th>
-                <th width="5%"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><input type="text" class="form-control" name="TenThuoc[]" placeholder="VD: Amoxicillin 500mg"></td>
-                <td>
-                    <select class="form-select text-muted" name="MaDVT[]">
-                        <option>Chọn..</option>
-                        <option value="1">Viên</option>
-                        <option value="3">Hộp</option>
+    <div class="custom-card mb-4">
+        <h5 class="fw-bold border-bottom pb-2 mb-3 text-dark"><i class="bi bi-info-circle me-2 text-primary"></i>Thông
+            tin chung</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-dark">Nhà Cung Cấp <span class="text-danger">*</span></label>
+                    <select name="MaNCC" class="form-select" asp-items="ViewBag.NhaCungCapList" required>
+                        <option value="">-- Chọn Nhà Cung Cấp --</option>
                     </select>
-                </td>
-                <td><input type="number" class="form-control input-qty" name="SoLuong[]" value="0" min="0"></td>
-                <td><input type="number" class="form-control input-price" name="DonGia[]" value="0" min="0"></td>
-                <td class="align-middle fw-bold row-total">0 đ</td>
-                <td class="align-middle text-end"><i class="bi bi-trash text-danger cursor-pointer btn-delete-row"
-                                                         style="cursor: pointer;"></i></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <button type="button" id="btnAddRow" class="btn btn-outline-primary bg-white btn-sm px-3 fw-medium"
-                    style="border-radius: 8px;">
-                <i class="bi bi-plus me-1"></i> Thêm Dòng
-            </button>
-            <div class="fs-5">
-                <span class="text-muted me-2 fs-6">Tổng cộng:</span>
-                <span class="fw-bold text-dark" id="grandTotal">0 đ</span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-dark">Thời gian nhập kho</label>
+                    <input type="datetime-local" name="NgayNhap" class="form-control"
+                           value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold text-dark">Ghi chú / Diễn giải</label>
+                    <textarea name="GhiChu" class="form-control" rows="2"
+                              placeholder="Ghi chú thêm về lô hàng (nếu có)..."></textarea>
+                </div>
             </div>
         </div>
 
-        <div class="text-end">
-            <button class="btn btn-primary px-4 py-2 fw-medium shadow-sm" style="border-radius: 8px;">
-                <i class="bi bi-floppy me-2"></i>Lưu & Xác nhận
-            </button>
-        </div>
+        <div class="custom-card">
+            <h5 class="fw-bold border-bottom pb-2 mb-3 text-dark"><i class="bi bi-box-seam me-2 text-primary"></i>Chi tiết
+                hàng nhập</h5>
+                <div class="table-responsive" style="overflow-x: visible;">
+                    <table class="table table-borderless mb-2" id="chiTietTable">
+                        <thead>
+                            <tr class="text-muted" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                <th width="35%">TÊN THUỐC</th>
+                                <th width="20%">ĐƠN VỊ TÍNH</th>
+                                <th width="15%">SỐ LƯỢNG</th>
+                                <th width="20%">ĐƠN GIÁ (VNĐ)</th>
+                                <th width="10%">THÀNH TIỀN</th>
+                                <th width="5%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="form-control" name="TenThuoc[]" placeholder="Nhập tên thuốc..."
+                                               required></td>
+                                    <td>
+                                        <select class="form-select text-dark" name="MaDVT[]" asp-items="ViewBag.DonViTinhList"
+                                                required>
+                                            <option value="">-- Chọn ĐVT --</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="number" class="form-control input-qty" name="SoLuong[]" value="1" min="1"
+                                                   required></td>
+                                        <td><input type="number" class="form-control input-price" name="DonGia[]" value="0" min="0"
+                                                       required></td>
+                                            <td class="align-middle fw-bold row-total text-primary">0 đ</td>
+                                            <td class="align-middle text-end"><i
+                                                class="bi bi-trash text-danger cursor-pointer btn-delete-row"
+                                                style="cursor: pointer; font-size: 1.2rem;"></i></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
+                                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                                    <button type="button" id="btnAddRow" class="btn btn-outline-primary bg-transparent btn-sm px-3 fw-medium"
+                                            style="border-radius: 8px;">
+                                        <i class="bi bi-plus me-1"></i> Thêm Dòng Khác
+                                    </button>
+                                    <div class="fs-5">
+                                        <span class="text-muted me-2 fs-6">Tổng cộng:</span>
+                                        <span class="fw-bold text-danger fs-4" id="grandTotal">0 đ</span>
+                                    </div>
+                                </div>
+                            </div>
 
-        
-        @section Scripts {
-            <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const tableBody = document.querySelector('#chiTietTable tbody');
-                        const btnAddRow = document.getElementById('btnAddRow');
-                        const grandTotalEl = document.getElementById('grandTotal');
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm" style="border-radius: 8px;">
+                                    <i class="bi bi-floppy me-2"></i> Lưu Phiếu Nhập
+                                </button>
+                            </div>
+                        </form>
 
-                        // 1. Hàm tính toán lại tổng tiền
-                        function calculateTotals() {
-                            let grandTotal = 0;
-                            const rows = tableBody.querySelectorAll('tr');
+                        @section Scripts {
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const tableBody = document.querySelector('#chiTietTable tbody');
+                                    const btnAddRow = document.getElementById('btnAddRow');
+                                    const grandTotalEl = document.getElementById('grandTotal');
 
-                            rows.forEach(row => {
-                                const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-                                const price = parseFloat(row.querySelector('.input-price').value) || 0;
-                                const total = qty * price;
+                                    // 1. Hàm tính toán lại tổng tiền
+                                    function calculateTotals() {
+                                        let grandTotal = 0;
+                                        const rows = tableBody.querySelectorAll('tr');
 
-                                // Hiển thị định dạng tiền Việt Nam
-                                row.querySelector('.row-total').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
-                                grandTotal += total;
-                            });
+                                        rows.forEach(row => {
+                                            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
+                                            const price = parseFloat(row.querySelector('.input-price').value) || 0;
+                                            const total = qty * price;
 
-                            grandTotalEl.textContent = new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ';
-                        }
+                                            row.querySelector('.row-total').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
+                                            grandTotal += total;
+                                        });
 
-                        // 2. Lắng nghe sự kiện thay đổi Số lượng hoặc Đơn giá để tính tiền tự động
-                        tableBody.addEventListener('input', function (e) {
-                            if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-price')) {
-                                calculateTotals();
-                            }
-                        });
+                                        grandTotalEl.textContent = new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ';
+                                    }
 
-                        // 3. Xử lý nút Thêm Dòng
-                        btnAddRow.addEventListener('click', function () {
-                            // Copy dòng đầu tiên
-                            const firstRow = tableBody.querySelector('tr');
-                            const newRow = firstRow.cloneNode(true);
+                                    // 2. Lắng nghe thay đổi để tính tiền tự động
+                                    tableBody.addEventListener('input', function (e) {
+                                        if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-price')) {
+                                            calculateTotals();
+                                        }
+                                    });
 
-                            // Xóa sạch giá trị cũ trong dòng mới
-                            newRow.querySelectorAll('input').forEach(input => {
-                                input.value = input.type === 'number' ? '0' : '';
-                            });
-                            newRow.querySelector('.row-total').textContent = '0 đ';
+                                    // 3. Xử lý nút Thêm Dòng
+                                    btnAddRow.addEventListener('click', function () {
+                                        // Javascript sẽ clone nguyên dòng đầu tiên (bao gồm cả danh sách Option lấy từ Database)
+                                        const firstRow = tableBody.querySelector('tr');
+                                        const newRow = firstRow.cloneNode(true);
 
-                            tableBody.appendChild(newRow);
-                            calculateTotals();
-                        });
+                                        // Làm sạch các ô nhập liệu của dòng mới
+                                        newRow.querySelectorAll('input').forEach(input => {
+                                            if (input.type === 'number') {
+                                                input.value = input.classList.contains('input-qty') ? '1' : '0';
+                                            } else {
+                                                input.value = '';
+                                            }
+                                        });
+                                        newRow.querySelector('select').selectedIndex = 0; // Trả dropdown về "-- Chọn ĐVT --"
+                                        newRow.querySelector('.row-total').textContent = '0 đ';
 
-                        // 4. Xử lý nút Xóa Dòng
-                        tableBody.addEventListener('click', function (e) {
-                            // Đảm bảo bấm vào icon thùng rác
-                            if (e.target.classList.contains('btn-delete-row')) {
-                                const rowCount = tableBody.querySelectorAll('tr').length;
-                                if (rowCount > 1) {
-                                    e.target.closest('tr').remove();
+                                        tableBody.appendChild(newRow);
+                                        calculateTotals();
+                                    });
+
+                                    // 4. Xử lý nút Xóa Dòng
+                                    tableBody.addEventListener('click', function (e) {
+                                        if (e.target.classList.contains('btn-delete-row')) {
+                                            const rowCount = tableBody.querySelectorAll('tr').length;
+                                            if (rowCount > 1) {
+                                                e.target.closest('tr').remove();
+                                                calculateTotals();
+                                            } else {
+                                                alert('Phải giữ lại ít nhất 1 dòng để lập phiếu!');
+                                            }
+                                        }
+                                    });
+
+                                    // Tính toán lần đầu khi vừa mở trang
                                     calculateTotals();
-                                } else {
-                                    alert('Phải giữ lại ít nhất 1 dòng chi tiết!');
-                                }
-                            }
-                        });
-                    });
-            </script>
-        }
+                                });
+                            </script>
+                        }

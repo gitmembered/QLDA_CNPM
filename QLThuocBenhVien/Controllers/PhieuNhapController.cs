@@ -16,71 +16,113 @@ namespace QLThuocBenhVien.Controllers
             _context = context;
         }
 
-        // GET: PhieuNhap/Create (Hiển thị form nhập kho)
+        // GET: PhieuNhap (Xem lại danh sách các phiếu đã lập)
+        public async Task<IActionResult> Index()
+        {
+            var dsPhieu = await _context.PhieuNhap
+                .Include(p => p.NhaCungCap)
+                .OrderByDescending(p => p.NgayNhap)
+                .ToListAsync();
+            return View(dsPhieu);
+        }
+
+        // GET: PhieuNhap/Details/5 (Xem chi tiết 1 phiếu nhập cụ thể)
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var phieu = await _context.PhieuNhap
+                .Include(p => p.NhaCungCap)
+                .Include(p => p.ChiTietPhieuNhaps)
+                    .ThenInclude(ct => ct.DonViTinh)
+                .FirstOrDefaultAsync(m => m.MaPN == id);
+
+            if (phieu == null) return NotFound();
+
+            return View(phieu);
+        }
+
+        // GET: PhieuNhap/Create
         public async Task<IActionResult> Create()
         {
-            // Lấy danh sách nhà cung cấp từ database để đổ vào thẻ <select>
-            var dsNhaCungCap = await _context.NhaCungCap.ToListAsync();
-            ViewBag.NhaCungCapList = new SelectList(dsNhaCungCap, "MaNCC", "TenNCC");
-
-            // Lấy danh sách Đơn vị tính
-            var dsDonViTinh = await _context.DonViTinh.ToListAsync();
-            ViewBag.DonViTinhList = new SelectList(dsDonViTinh, "MaDVT", "TenDVT");
-
+            ViewBag.NhaCungCapList = new SelectList(await _context.NhaCungCap.ToListAsync(), "MaNCC", "TenNCC");
+            ViewBag.DonViTinhList = new SelectList(await _context.DonViTinh.ToListAsync(), "MaDVT", "TenDVT");
             return View();
         }
 
-        // POST: PhieuNhap/Create (Xử lý khi bấm nút Lưu & Xác nhận)
+        // POST: PhieuNhap/Create (Xử lý lưu thực tế vào CSDL và tự ghi Log)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(IFormCollection form)
+        public async Task<IActionResult> Create(IFormCollection form, int MaNCC, DateTime NgayNhap, string GhiChu)
         {
-            // 1. Nhận các mảng dữ liệu từ các dòng động trên giao diện HTML
             var tenThuocs = form["TenThuoc[]"];
+            var maDVTs = form["MaDVT[]"];
             var soLuongs = form["SoLuong[]"];
             var donGias = form["DonGia[]"];
 
-            decimal tongTien = 0;
-            int soLoaiThuoc = 0;
+            if (tenThuocs.Count == 0 || MaNCC == 0) return RedirectToAction(nameof(Create));
 
-            // 2. Vòng lặp quét qua từng dòng thuốc được nhập
+            // 1. Khởi tạo đối tượng Phiếu Nhập Gốc
+            var phieuNhap = new PhieuNhap
+            {
+                MaNCC = MaNCC,
+                NgayNhap = NgayNhap,
+                GhiChu = GhiChu,
+                TongTien = 0
+            };
+            _context.PhieuNhap.Add(phieuNhap);
+            await _context.SaveChangesAsync(); // Lưu trước để sinh MaPN tự động
+
+            decimal tongTien = 0;
+
+            // 2. Lưu danh sách chi tiết hàng nhập
             for (int i = 0; i < tenThuocs.Count; i++)
             {
                 if (!string.IsNullOrWhiteSpace(tenThuocs[i]))
                 {
-                    // Ép kiểu an toàn để tránh lỗi nếu người dùng để trống
-                    int soLuong = int.TryParse(soLuongs[i], out int q) ? q : 0;
-                    decimal donGia = decimal.TryParse(donGias[i], out decimal p) ? p : 0;
+                    int q = int.TryParse(soLuongs[i], out int qty) ? qty : 0;
+                    decimal p = decimal.TryParse(donGias[i], out decimal price) ? price : 0;
+                    int dvt = int.TryParse(maDVTs[i], out int d) ? d : 0;
 
-                    tongTien += (soLuong * donGia);
-                    soLoaiThuoc++;
+                    var ct = new ChiTietPhieuNhap
+                    {
+                        MaPN = phieuNhap.MaPN,
+                        TenThuoc = tenThuocs[i],
+                        MaDVT = dvt,
+                        SoLuong = q,
+                        DonGia = p
+                    };
+                    _context.ChiTietPhieuNhap.Add(ct);
+                    tongTien += (q * p);
 
-                    // --- Lưu ý quan trọng ---
-                    // Khi bạn tạo xong bảng PHIEUNHAP và CHITIET_PHIEUNHAP trong CSDL,
-                    // Bạn sẽ chèn lệnh _context.PhieuNhap.Add() và _context.ChiTietPhieuNhap.Add() ở ngay đây.
+                    // [Tùy chọn nâng cao] Cộng dồn trực tiếp số lượng vào kho nếu thuốc đã có tên sẵn
+                    var thuocTrongKho = await _context.Thuoc.FirstOrDefaultAsync(t => t.TenThuoc == tenThuocs[i]);
+                    if (thuocTrongKho != null)
+                    {
+                        thuocTrongKho.SoLuongTon += q;
+                        _context.Update(thuocTrongKho);
+                    }
                 }
             }
 
-            // 3. Thực hiện ghi Log nếu có nhập thuốc
-            if (soLoaiThuoc > 0)
+            // 3. Cập nhật lại tổng tiền thực của phiếu nhập
+            phieuNhap.TongTien = tongTien;
+            _context.Update(phieuNhap);
+
+            // 4. Đồng bộ ghi nhận vào Nhật ký hệ thống (Logs)
+            var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
+            _context.NhatKyHeThong.Add(new NhatKyHeThong
             {
-                var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
+                ThoiGian = DateTime.Now,
+                Loai = "Info",
+                NoiDung = $"Lập phiếu nhập kho #{phieuNhap.MaPN:D4}. Tổng giá trị: {tongTien:N0} đ",
+                NguoiThucHien = nguoiDung
+            });
 
-                _context.NhatKyHeThong.Add(new NhatKyHeThong
-                {
-                    ThoiGian = DateTime.Now,
-                    Loai = "Info",
-                    NoiDung = $"Lập phiếu nhập kho: {soLoaiThuoc} loại thuốc. Tổng trị giá: {tongTien:N0} VNĐ",
-                    NguoiThucHien = nguoiDung
-                });
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Đã lập thành công phiếu nhập #{phieuNhap.MaPN:D4}!";
 
-                await _context.SaveChangesAsync();
-
-                // Trả về thông báo thành công cho màn hình Kho Thuốc
-                TempData["SuccessMessage"] = $"Đã lập phiếu nhập kho thành công ({tongTien:N0} đ)!";
-            }
-
-            return RedirectToAction("Index", "Thuoc");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -14,7 +14,11 @@ namespace QLThuocBenhVien.Data
         public DbSet<DonViTinh> DonViTinh { get; set; }
         public DbSet<TaiKhoan> TaiKhoan { get; set; }
         public DbSet<NhatKyHeThong> NhatKyHeThong { get; set; }
-
+        public DbSet<PhieuNhap> PhieuNhap { get; set; }
+        public DbSet<ChiTietPhieuNhap> ChiTietPhieuNhap { get; set; }
+        public DbSet<PhieuXuat> PhieuXuat { get; set; }
+        public DbSet<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
+        public DbSet<BaoCao> BaoCao { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ThuocNhomBenh>().ToTable("THUOC_NHOMBENH");
