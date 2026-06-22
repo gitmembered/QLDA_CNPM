@@ -53,7 +53,7 @@ namespace QLThuocBenhVien.Controllers
         // POST: PhieuNhap/Create (Xử lý lưu thực tế vào CSDL và tự ghi Log)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(IFormCollection form, int MaNCC, DateTime NgayNhap, string GhiChu)
+        public async Task<IActionResult> Create(IFormCollection form, int MaNCC, string GhiChu)
         {
             var tenThuocs = form["TenThuoc[]"];
             var maDVTs = form["MaDVT[]"];
@@ -66,16 +66,17 @@ namespace QLThuocBenhVien.Controllers
             var phieuNhap = new PhieuNhap
             {
                 MaNCC = MaNCC,
-                NgayNhap = NgayNhap,
+                NgayNhap = DateTime.Now, // NÂNG CẤP: Lấy chính xác ngày, giờ, phút, giây thực tế lúc bấm Lưu
                 GhiChu = GhiChu,
                 TongTien = 0
             };
+
             _context.PhieuNhap.Add(phieuNhap);
             await _context.SaveChangesAsync(); // Lưu trước để sinh MaPN tự động
 
             decimal tongTien = 0;
 
-            // 2. Lưu danh sách chi tiết hàng nhập
+            // 2. Lưu danh sách chi tiết hàng nhập và CỘNG DỒN VÀO KHO
             for (int i = 0; i < tenThuocs.Count; i++)
             {
                 if (!string.IsNullOrWhiteSpace(tenThuocs[i]))
@@ -84,10 +85,13 @@ namespace QLThuocBenhVien.Controllers
                     decimal p = decimal.TryParse(donGias[i], out decimal price) ? price : 0;
                     int dvt = int.TryParse(maDVTs[i], out int d) ? d : 0;
 
+                    // NÂNG CẤP: Cắt bỏ mọi khoảng trắng thừa ở đầu/cuối chuỗi người dùng nhập
+                    string tenThuocNhap = tenThuocs[i].Trim();
+
                     var ct = new ChiTietPhieuNhap
                     {
                         MaPN = phieuNhap.MaPN,
-                        TenThuoc = tenThuocs[i],
+                        TenThuoc = tenThuocNhap,
                         MaDVT = dvt,
                         SoLuong = q,
                         DonGia = p
@@ -95,21 +99,26 @@ namespace QLThuocBenhVien.Controllers
                     _context.ChiTietPhieuNhap.Add(ct);
                     tongTien += (q * p);
 
-                    // [Tùy chọn nâng cao] Cộng dồn trực tiếp số lượng vào kho nếu thuốc đã có tên sẵn
-                    var thuocTrongKho = await _context.Thuoc.FirstOrDefaultAsync(t => t.TenThuoc == tenThuocs[i]);
+                    // =========================================================================
+                    // 3. TỰ ĐỘNG CỘNG DỒN VÀO KHO THUỐC (MASTER DATA)
+                    // NÂNG CẤP: So sánh không phân biệt chữ hoa/chữ thường để tránh lỗi do gõ sai
+                    // =========================================================================
+                    var thuocTrongKho = await _context.Thuoc
+                        .FirstOrDefaultAsync(t => t.TenThuoc.ToLower() == tenThuocNhap.ToLower());
+
                     if (thuocTrongKho != null)
                     {
-                        thuocTrongKho.SoLuongTon += q;
-                        _context.Update(thuocTrongKho);
+                        thuocTrongKho.SoLuongTon += q; // Cộng dồn số lượng
+                        _context.Thuoc.Update(thuocTrongKho);
                     }
                 }
             }
 
-            // 3. Cập nhật lại tổng tiền thực của phiếu nhập
+            // 4. Cập nhật lại tổng tiền thực của phiếu nhập
             phieuNhap.TongTien = tongTien;
-            _context.Update(phieuNhap);
+            _context.PhieuNhap.Update(phieuNhap);
 
-            // 4. Đồng bộ ghi nhận vào Nhật ký hệ thống (Logs)
+            // 5. Đồng bộ ghi nhận vào Nhật ký hệ thống (Logs)
             var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
             _context.NhatKyHeThong.Add(new NhatKyHeThong
             {
@@ -120,7 +129,7 @@ namespace QLThuocBenhVien.Controllers
             });
 
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Đã lập thành công phiếu nhập #{phieuNhap.MaPN:D4}!";
+            TempData["SuccessMessage"] = $"Đã lập thành công phiếu nhập #{phieuNhap.MaPN:D4} và cập nhật tồn kho!";
 
             return RedirectToAction(nameof(Index));
         }
