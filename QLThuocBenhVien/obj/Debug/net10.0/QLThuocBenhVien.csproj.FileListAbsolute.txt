@@ -9,6 +9,11 @@ C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\QLThuocBenhVien.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\QLThuocBenhVien.pdb
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Azure.Core.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Azure.Identity.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.Parser.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ExcelNumberFormat.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Humanizer.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
@@ -38,6 +43,8 @@ C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Microsoft.VisualStudio.SolutionPersistence.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Mono.TextTemplating.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\Newtonsoft.Json.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\RBush.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\SixLabors.Fonts.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.ClientModel.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.CodeDom.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Composition.AttributedModel.dll
@@ -47,6 +54,7 @@ C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Composition.Runtime.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Composition.TypedParts.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.IO.Packaging.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Memory.Data.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
 C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\cs\Microsoft.CodeAnalysis.resources.dll
@@ -223,11 +231,3 @@ C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\refint\QLThuocBenhVien.dll
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.pdb
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.genruntimeconfig.cache
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\ref\QLThuocBenhVien.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ClosedXML.Parser.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\DocumentFormat.OpenXml.Framework.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\ExcelNumberFormat.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\RBush.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\SixLabors.Fonts.dll
-C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\System.IO.Packaging.dll

@@ -1,89 +1,217 @@
 @{
-    ViewData["Title"] = "Tổng Quan";
+    ViewData["Title"] = "Tổng Quan Hệ Thống";
 }
 
 <div class="mb-4">
     <h3 class="fw-bold mb-1">Tổng Quan Hệ Thống</h3>
-    <p class="text-muted">Chào mừng trở lại. Dưới đây là tình hình kho thuốc hôm nay.</p>
+    <p class="text-muted mb-0">Chào mừng trở lại. Dưới đây là tình hình kho thuốc hôm nay.</p>
 </div>
 
 <div class="row g-4 mb-4">
     <div class="col-md-3">
-        <div class="custom-card">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <span class="text-muted fw-medium">Tổng Mã Thuốc</span>
-                <div class="bg-primary bg-opacity-10 text-primary rounded p-2"><i class="bi bi-box-seam"></i></div>
+        <div class="custom-card p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted fw-medium fs-sm">Tổng Mã Thuốc</span>
+                <i class="bi bi-box text-primary fs-5"></i>
             </div>
-            <h3 class="fw-bold mb-1">2,451</h3>
-            <small class="text-success fw-bold">+12% so với tháng trước</small>
+            <h3 class="fw-bold text-dark mb-1">@ViewBag.TongMaThuoc</h3>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="custom-card">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <span class="text-muted fw-medium">Cảnh Báo Sắp Hết Hàng</span>
-                <div class="bg-danger bg-opacity-10 text-danger rounded p-2"><i class="bi bi-exclamation-triangle"></i>
-                </div>
+        <div class="custom-card p-3 h-100 cursor-pointer" data-bs-toggle="modal" data-bs-target="#modalSapHetHang"
+             style="transition: 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.transform='translateY(0)'">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted fw-medium fs-sm">Cảnh Báo Sắp Hết Hàng</span>
+                <i class="bi bi-exclamation-triangle text-danger fs-5"></i>
             </div>
-            <h3 class="fw-bold mb-0">14</h3>
+            <h3 class="fw-bold text-dark mb-1">@ViewBag.SapHetHangCount</h3>
+            <span class="text-primary fs-sm fw-medium"><i class="bi bi-search me-1"></i>Bấm để xem chi tiết</span>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="custom-card">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <span class="text-muted fw-medium">Thuốc Sắp Hết Hạn</span>
-                <div class="bg-primary bg-opacity-10 text-primary rounded p-2"><i class="bi bi-clock"></i></div>
+        <div class="custom-card p-3 h-100 cursor-pointer" data-bs-toggle="modal" data-bs-target="#modalSapHetHan"
+             style="transition: 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.transform='translateY(0)'">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted fw-medium fs-sm">Thuốc Sắp Hết Hạn</span>
+                <i class="bi bi-clock-history text-warning fs-5"></i>
             </div>
-            <h3 class="fw-bold mb-0">8</h3>
+            <h3 class="fw-bold text-dark mb-1">@ViewBag.SapHetHanCount</h3>
+            <span class="text-primary fs-sm fw-medium"><i class="bi bi-search me-1"></i>Bấm để xem chi tiết</span>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="custom-card">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-                <span class="text-muted fw-medium">Tổng Giá Trị Kho</span>
-                <div class="bg-success bg-opacity-10 text-success rounded p-2"><i class="bi bi-cash-stack"></i></div>
+        <div class="custom-card p-3 h-100 bg-dark text-white border-0">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-gray-400 fw-medium fs-sm">Tổng Giá Trị Kho</span>
+                <i class="bi bi-cash-stack text-success fs-5"></i>
             </div>
-            <h3 class="fw-bold mb-0">124.500.000 đ</h3>
+            <h3 class="fw-bold mb-1">@ViewBag.TongGiaTriKho.ToString("N0") đ</h3>
         </div>
     </div>
 </div>
 
 <div class="row g-4">
     <div class="col-md-8">
-        <div class="custom-card h-100">
-            <h5 class="fw-bold mb-4">Số Lượng Thuốc Theo Nhóm Bệnh</h5>
-            <div class="d-flex align-items-end justify-content-around mt-5"
-                 style="height: 200px; border-bottom: 1px dashed #E5E7EB; border-left: 1px dashed #E5E7EB; padding-bottom: 0;">
-                <div class="bg-primary rounded-top" style="width: 40px; height: 60%;" title="Hô hấp"></div>
-                <div class="bg-primary rounded-top" style="width: 40px; height: 40%;" title="Tiêu hóa"></div>
-                <div class="bg-primary rounded-top" style="width: 40px; height: 90%;" title="Thần kinh"></div>
-                <div class="bg-primary rounded-top" style="width: 40px; height: 30%;" title="Tim mạch"></div>
-                <div class="bg-primary rounded-top" style="width: 40px; height: 20%;" title="Xương khớp"></div>
+        <div class="custom-card p-4 h-100">
+            <h5 class="fw-bold text-dark mb-4">Số Lượng Thuốc Theo Nhóm Bệnh</h5>
+            <div style="height: 300px; position: relative;">
+                <canvas id="barChart"></canvas>
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="custom-card h-100">
+        <div class="custom-card p-4 h-100">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="fw-bold mb-0">Cảnh Báo Gần Đây</h5>
-                <a href="#" class="text-decoration-none text-primary fs-sm fw-medium">Xem tất cả</a>
+                <h5 class="fw-bold text-dark mb-0">Thông Báo Gần Đây</h5>
+                <a asp-controller="Settings" asp-action="Index"
+                   class="text-primary text-decoration-none fs-sm fw-medium">Xem tất cả</a>
             </div>
 
-            <div class="d-flex mb-3">
-                <div class="mt-1 me-3 text-danger"><i class="bi bi-circle-fill" style="font-size: 8px;"></i></div>
-                <div>
-                    <div class="fw-medium text-dark">Amoxicillin sắp hết hàng nghiêm trọng</div>
-                    <small class="text-muted">10 phút trước</small>
-                </div>
-            </div>
-            <div class="d-flex mb-3">
-                <div class="mt-1 me-3 text-warning"><i class="bi bi-circle-fill" style="font-size: 8px;"></i></div>
-                <div>
-                    <div class="fw-medium text-dark">Ibuprofen hết hạn trong 30 ngày</div>
-                    <small class="text-muted">1 giờ trước</small>
+            @if (ViewBag.ThongBaoGanDay != null)
+            {
+                foreach (var tb in ViewBag.ThongBaoGanDay)
+                {
+                    <div class="d-flex mb-4">
+                        <div class="mt-1 me-3">
+                            <div class="bg-@tb.Loai-subtle text-@tb.Loai rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px;">
+                                <i class="bi @tb.Icon"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-dark fw-bold mb-1 fs-sm">@tb.TieuDe</p>
+                            <p class="text-muted mb-1 fs-sm">@tb.NoiDung</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">@tb.ThoiGian.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSapHetHang" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content custom-card p-0">
+                <div class="modal-header border-bottom bg-danger-subtle">
+                    <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Danh sách
+                        thuốc sắp hết hàng</h5>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Tên Thuốc</th>
+                                    <th>Đơn Vị</th>
+                                    <th class="text-danger">Tồn Kho Hiện Tại</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.SapHetHangList != null)
+                                {
+                                    foreach (var thuoc in ViewBag.SapHetHangList)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
+                                            <td>@thuoc.DonViTinh</td>
+                                            <td class="fw-bold text-danger">@thuoc.SoLuongTon (Sắp hết)</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
+        <div class="modal fade" id="modalSapHetHan" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content custom-card p-0">
+                    <div class="modal-header border-bottom bg-warning-subtle">
+                        <h5 class="modal-title fw-bold text-warning-emphasis"><i class="bi bi-clock-history me-2"></i>Danh
+                            sách
+                            thuốc sắp/đã hết hạn</h5>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4 text-center">
+                            @if (ViewBag.SapHetHanList == null || ViewBag.SapHetHanCount == 0)
+                            {
+                                <p class="text-muted mb-0">Hệ thống ghi nhận không có lô thuốc nào sắp hết hạn trong 30 ngày tới.
+                                </p>
+                            }
+                            else
+                            {
+                                <table class="table table-hover mb-0 text-start">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Tên Thuốc</th>
+                                            <th>Hạn Sử Dụng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var thuoc in ViewBag.SapHetHanList)
+                                        {
+                                            <tr>
+                                                <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
+                                                <td>@thuoc.HanSuDung.ToString("dd/MM/yyyy")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @section Scripts {
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                    // Lấy nhãn (Tên nhóm bệnh) và dữ liệu (Số lượng) từ C# Backend truyền xuống
+                    const chartLabels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+                    const chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+
+                    const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                    const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
+                    const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
+                    const ctxBar = document.getElementById('barChart').getContext('2d');
+                    new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                    labels: chartLabels, // Đã hiển thị đúng tên Nhóm bệnh
+                    datasets: [{
+                    label: 'Số đầu thuốc',
+                    data: chartData,
+                    backgroundColor: '#2563EB',
+                    borderRadius: 4,
+                    barPercentage: 0.4
+                    }]
+                    },
+                    options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                    x: {
+                    ticks: { color: textColor },
+                    grid: { display: false }
+                    },
+                    y: {
+                    ticks: { color: textColor, stepSize: 1 },
+                    grid: { color: gridColor, borderDash: [5, 5] }
+                    }
+                    }
+                    }
+                    });
+                    });
+                </script>
+            }

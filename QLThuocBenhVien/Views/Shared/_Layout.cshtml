@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 @using System.Security.Claims
+@inject QLThuocBenhVien.Data.ApplicationDbContext _context
 <html lang="vi">
 
 <head>
@@ -275,149 +276,182 @@
         <header class="top-header">
             <div class="user-profile d-flex align-items-center gap-3">
 
+                @{
+                    var thirtyDays = DateTime.Now.AddDays(30);
+
+                    // Lấy thuốc sắp hết hàng (tồn <= 50)
+                    var sapHetHangList = _context.Thuoc.Where(t => t.SoLuongTon <= 50).ToList();
+
+                    // Lấy thuốc sắp hết hạn (còn <= 30 ngày)
+
+                    var sapHetHanList = new List<QLThuocBenhVien.Models.Thuoc>();
+                    try
+                    {
+                        sapHetHanList = _context.Thuoc.Where(t => t.HanSuDung <= thirtyDays).ToList();
+                    }
+                    catch { }
+
+                    int tongThongBao = sapHetHangList.Count + sapHetHanList.Count;
+                }
+
                 <div class="dropdown">
                     <button class="btn btn-link text-muted p-0 position-relative shadow-none" type="button"
                             id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-bell fs-5"></i>
-                        <span
-                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        @if (tongThongBao > 0)
+                        {
+                            <span
+                            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                        }
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2"
                         aria-labelledby="notificationDropdown" style="width: 320px; font-size: 0.9rem;"
                         id="notificationList">
                         <li class="p-2 border-bottom d-flex justify-content-between align-items-center">
-                            <h6 class="fw-bold mb-0 text-dark">Thông báo kho mới nhất</h6>
-                            <button class="btn btn-sm btn-link text-danger text-decoration-none p-0 fw-medium"
-                                    id="clearAllNotifications" style="font-size: 0.8rem;">Xóa tất cả</button>
-                        </li>
+                            <h6 class="fw-bold mb-0 text-dark">Thông báo kho mới nhất <span
+                                class="badge bg-danger ms-1">@tongThongBao</span></h6>
+                            </li>
 
-                        <li class="notification-item">
-                            <div class="d-flex align-items-center dropdown-item p-2 rounded-2 text-wrap custom-hover">
-                                <a class="d-flex align-items-start gap-2 text-decoration-none flex-grow-1"
-                                   href="@Url.Action("Index", "Thuoc", new { searchString = "Amoxicillin" })">
-                                    <span class="text-danger mt-1"><i class="bi bi-circle-fill"
-                                                                          style="font-size: 8px;"></i></span>
-                                        <div>
-                                            <div class="fw-semibold text-dark">Amoxicillin 500mg sắp hết hàng!</div>
-                                            <small class="text-muted">Số lượng tồn kho hiện tại còn dưới 10.</small>
-                                        </div>
-                                    </a>
-                                    <button class="btn btn-sm text-muted p-1 ms-1 btn-remove-noti border-0 shadow-none"><i
-                                        class="bi bi-x-lg"></i></button>
-                                    </div>
+                            @if (tongThongBao == 0)
+                            {
+                                <li class="p-4 text-center text-muted">
+                                    <i class="bi bi-check2-circle fs-3 text-success d-block mb-1"></i>
+                                    Hệ thống ổn định, không có cảnh báo nào!
                                 </li>
-
-                                <li class="notification-item">
-                                    <div class="d-flex align-items-center dropdown-item p-2 rounded-2 text-wrap custom-hover">
-                                        <a class="d-flex align-items-start gap-2 text-decoration-none flex-grow-1"
-                                           href="@Url.Action("Index", "Thuoc", new { searchString = "Ibuprofen" })">
-                                            <span class="text-warning mt-1"><i class="bi bi-circle-fill"
-                                                                                   style="font-size: 8px;"></i></span>
-                                                <div>
-                                                    <div class="fw-semibold text-dark">Ibuprofen 400mg sắp hết hạn!</div>
-                                                    <small class="text-muted">Lô thuốc sẽ hết hạn sử dụng trong vòng 30 ngày
-                                                        tới.</small>
-                                                    </div>
-                                                </a>
-                                                <button class="btn btn-sm text-muted p-1 ms-1 btn-remove-noti border-0 shadow-none"><i
-                                                    class="bi bi-x-lg"></i></button>
+                            }
+                            else
+                            {
+                                @foreach (var t in sapHetHanList)
+                                {
+                                    <li class="notification-item">
+                                        <div class="d-flex align-items-center dropdown-item p-2 rounded-2 text-wrap custom-hover">
+                                            <a class="d-flex align-items-start gap-2 text-decoration-none flex-grow-1"
+                                               href="@Url.Action("Index", "Thuoc", new { searchString = t.TenThuoc })">
+                                                <span class="text-warning mt-1"><i class="bi bi-circle-fill"
+                                                                                       style="font-size: 8px;"></i></span>
+                                                    <div>
+                                                        <div class="fw-semibold text-dark">@t.TenThuoc sắp hết hạn!</div>
+                                                        <small class="text-muted">Hạn sử dụng:
+                                                            @t.HanSuDung.ToString("dd/MM/yyyy").</small>
+                                                        </div>
+                                                    </a>
                                                 </div>
                                             </li>
+                                        }
+
+                                        @foreach (var t in sapHetHangList)
+                                        {
+                                            <li class="notification-item">
+                                                <div class="d-flex align-items-center dropdown-item p-2 rounded-2 text-wrap custom-hover">
+                                                    <a class="d-flex align-items-start gap-2 text-decoration-none flex-grow-1"
+                                                       href="@Url.Action("Index", "Thuoc", new { searchString = t.TenThuoc })">
+                                                        <span class="text-danger mt-1"><i class="bi bi-circle-fill"
+                                                                                              style="font-size: 8px;"></i></span>
+                                                            <div>
+                                                                <div class="fw-semibold text-dark">@t.TenThuoc sắp hết hàng!</div>
+                                                                <small class="text-muted">Số lượng tồn kho hiện tại chỉ còn: @t.SoLuongTon
+                                                                    @t.DonViTinh.</small>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            }
 
                                             <li id="noti-divider">
                                                 <hr class="dropdown-divider">
                                             </li>
                                             <li class="text-center" id="noti-view-all">
                                                 <a class="text-primary text-decoration-none fw-medium d-block py-1"
-                                                   style="font-size: 0.85rem;" href="@Url.Action("Index", "Thuoc")">Xem tất cả trong Kho
-                                                    thuốc</a>
+                                                   style="font-size: 0.85rem;" href="@Url.Action("Index", "Thuoc")">Tới trang Quản lý
+                                                    Kho</a>
                                                 </li>
                                             </ul>
                                         </div>
 
                                         <a href="@Url.Action("Profile", "Account")"
-                                           class="d-flex align-items-center text-decoration-none text-dark border-start ps-3"
+                                           class="d-flex align-items-center text-decoration-none text-dark border-start ps-3 ms-2"
                                            title="Xem hồ sơ cá nhân">
                                             <div class="text-end lh-sm border-0 bg-transparent p-0">
                                                 <div class="fw-bold fs-6 text-dark">@User.FindFirst("FullName")?.Value</div>
-                                                <small class="text-muted">@User.FindFirst(ClaimTypes.Role)?.Value</small>
+                                                <small class="text-muted">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</small>
                                             </div>
-
-                                            @{
-                                                // Lấy ảnh Avatar, nếu không có thì tạo ảnh giả lập từ tên
-                                                var claimAvatar = User.FindFirst("Avatar")?.Value;
-                                                var fullNameStr = User.FindFirst("FullName")?.Value ?? "User";
-                                                var headerAvatarSrc = string.IsNullOrEmpty(claimAvatar) ?
-                                            $"https://ui-avatars.com/api/?name={fullNameStr}&background=0D8ABC&color=fff" : claimAvatar;
-                                            }
-                                            <img src="@headerAvatarSrc" class="rounded-circle ms-2 shadow-sm"
-                                                 style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #2563EB;"
-                                                 alt="User Avatar" />
                                         </a>
+                                        @{
+                                            // Lấy ảnh Avatar, nếu không có thì tạo ảnh giả lập từ tên
+                                            var claimAvatar = User.FindFirst("Avatar")?.Value;
+                                            var fullNameStr = User.FindFirst("FullName")?.Value ?? "User";
+                                            var headerAvatarSrc = string.IsNullOrEmpty(claimAvatar) ?
+                                        $"https://ui-avatars.com/api/?name={fullNameStr}&background=0D8ABC&color=fff" : claimAvatar;
+                                        }
+                                        <img src="@headerAvatarSrc" class="rounded-circle ms-2 shadow-sm"
+                                             style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #2563EB;"
+                                             alt="User Avatar" />
+                                    </a>
 
-                                    </div>
-                                </header>
+                                </div>
+                            </header>
 
-                                <main class="content-area">
-                                    @RenderBody()
-                                </main>
-                            </div>
+                            <main class="content-area">
+                                @RenderBody()
+                            </main>
+                        </div>
 
-                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-                            @await RenderSectionAsync("Scripts", required: false)
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                // XỬ LÝ GIAO DIỆN THÔNG BÁO (NOTIFICATIONS)
-                                const notiList = document.getElementById('notificationList');
-                                const clearAllBtn = document.getElementById('clearAllNotifications');
-                                const badge = document.querySelector('#notificationDropdown .bg-danger');
+                        @await RenderSectionAsync("Scripts", required: false)
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                            // XỬ LÝ GIAO DIỆN THÔNG BÁO (NOTIFICATIONS)
+                            const notiList = document.getElementById('notificationList');
+                            const clearAllBtn = document.getElementById('clearAllNotifications');
+                            const badge = document.querySelector('#notificationDropdown .bg-danger');
 
-                                // Hàm cập nhật trạng thái nếu xóa hết thông báo
-                                function checkEmptyNotifications() {
-                                const items = notiList.querySelectorAll('.notification-item');
-                                if (items.length === 0) {
-                                if (badge) badge.style.display = 'none'; // Ẩn chấm đỏ
+                            // Hàm cập nhật trạng thái nếu xóa hết thông báo
+                            function checkEmptyNotifications() {
+                            const items = notiList.querySelectorAll('.notification-item');
+                            if (items.length === 0) {
+                            if (badge) badge.style.display = 'none'; // Ẩn chấm đỏ
 
-                                // Hiển thị chữ "Không có thông báo"
-                                const emptyLi = document.createElement('li');
-                                emptyLi.className = 'p-4 text-center text-muted empty-noti';
-                                emptyLi.innerHTML = '<i class="bi bi-bell-slash fs-3 d-block mb-2 text-secondary"></i><small>Không có thông báo mới.</small>';
-                                notiList.insertBefore(emptyLi, document.getElementById('noti-divider'));
+                            // Hiển thị chữ "Không có thông báo"
+                            const emptyLi = document.createElement('li');
+                            emptyLi.className = 'p-4 text-center text-muted empty-noti';
+                            emptyLi.innerHTML = '<i class="bi bi-bell-slash fs-3 d-block mb-2 text-secondary"></i><small>Không có thông báo mới.</small>';
+                            notiList.insertBefore(emptyLi, document.getElementById('noti-divider'));
 
-                                // Ẩn nút Xóa tất cả
-                                if (clearAllBtn) clearAllBtn.style.display = 'none';
-                                }
-                                }
+                            // Ẩn nút Xóa tất cả
+                            if (clearAllBtn) clearAllBtn.style.display = 'none';
+                            }
+                            }
 
-                                if (notiList) {
-                                // Xóa từng thông báo
-                                notiList.addEventListener('click', function (e) {
-                                const removeBtn = e.target.closest('.btn-remove-noti');
-                                if (removeBtn) {
-                                e.preventDefault();
-                                e.stopPropagation(); // Giữ menu không bị đóng
-                                const item = removeBtn.closest('.notification-item');
-                                if (item) {
-                                item.remove();
-                                checkEmptyNotifications();
-                                }
-                                }
-                                });
-                                }
+                            if (notiList) {
+                            // Xóa từng thông báo
+                            notiList.addEventListener('click', function (e) {
+                            const removeBtn = e.target.closest('.btn-remove-noti');
+                            if (removeBtn) {
+                            e.preventDefault();
+                            e.stopPropagation(); // Giữ menu không bị đóng
+                            const item = removeBtn.closest('.notification-item');
+                            if (item) {
+                            item.remove();
+                            checkEmptyNotifications();
+                            }
+                            }
+                            });
+                            }
 
-                                // Xóa tất cả thông báo
-                                if (clearAllBtn) {
-                                clearAllBtn.addEventListener('click', function (e) {
-                                e.preventDefault();
-                                e.stopPropagation(); // Giữ menu không bị đóng
-                                const items = notiList.querySelectorAll('.notification-item');
-                                items.forEach(item => item.remove());
-                                checkEmptyNotifications();
-                                });
-                                }
-                                });
-                            </script>
-                        </body>
+                            // Xóa tất cả thông báo
+                            if (clearAllBtn) {
+                            clearAllBtn.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation(); // Giữ menu không bị đóng
+                            const items = notiList.querySelectorAll('.notification-item');
+                            items.forEach(item => item.remove());
+                            checkEmptyNotifications();
+                            });
+                            }
+                            });
+                        </script>
+                    </body>
 
-                    </html>
+                </html>

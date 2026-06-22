@@ -14,23 +14,30 @@
         @Html.AntiForgeryToken()
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
-                <label class="form-label text-dark fw-medium">Tên tiêu đề báo cáo</label>
-                <input type="text" name="tenBaoCao" class="form-control shadow-none" placeholder="Ví dụ: Báo cáo Quý 2"
-                       value="Báo cáo tổng hợp kho dược" required />
+                <label class="form-label text-dark fw-medium">Loại báo cáo</label>
+                <select name="loaiBaoCao" id="reportTypeSelect" class="form-select shadow-none">
+                    <option value="Tháng" selected>Báo cáo Tháng (30 ngày)</option>
+                    <option value="Tuần">Báo cáo Tuần (7 ngày)</option>
+                    <option value="Ngày">Báo cáo Ngày (Hôm nay)</option>
+                    <option value="Tùy Chọn">Tùy chọn khoảng thời gian</option>
+                </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label text-dark fw-medium">Từ ngày</label>
-                <input type="date" name="tuNgay" class="form-control shadow-none"
-                       value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")" required />
+                <input type="date" name="tuNgay" id="tuNgayInput" class="form-control shadow-none" required />
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label text-dark fw-medium">Đến ngày</label>
-                <input type="date" name="denNgay" class="form-control shadow-none"
-                       value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                <input type="date" name="denNgay" id="denNgayInput" class="form-control shadow-none" required />
             </div>
             <div class="col-md-3">
+                <label class="form-label text-dark fw-medium">Tên tiêu đề báo cáo</label>
+                <input type="text" name="tenBaoCao" id="tenBaoCaoInput" class="form-control shadow-none"
+                       value="Báo cáo kho dược theo Tháng" required />
+            </div>
+            <div class="col-md-2">
                 <button type="submit" class="btn btn-success w-100 fw-medium shadow-sm py-2">
-                    <i class="bi bi-file-earmark-excel me-2"></i>Tạo & Tải Báo Cáo
+                    <i class="bi bi-file-earmark-excel me-2"></i>Xuất Excel
                 </button>
             </div>
         </div>
@@ -41,182 +48,234 @@
     <div class="col-md-3">
         <div class="custom-card p-3 d-flex align-items-center justify-content-between">
             <div>
-                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
-                    GIÁ TRỊ NHẬP</small>
-                    <h4 class="fw-bold text-success mb-0">@ViewBag.TongTienNhap.ToString("N0")đ</h4>
+                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">TỔNG GIÁ TRỊ NHẬP</small>
+                <h4 class="fw-bold text-success mb-0">@ViewBag.TongTienNhap.ToString("N0")đ</h4>
+            </div>
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-success-subtle text-success fs-3"
+                 style="width: 48px; height: 48px;">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+            <div>
+                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">TỔNG GIÁ TRỊ XUẤT</small>
+                <h4 class="fw-bold text-danger mb-0">@ViewBag.TongTienXuat.ToString("N0")đ</h4>
+            </div>
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-danger-subtle text-danger fs-3"
+                 style="width: 48px; height: 48px;">
+                <i class="bi bi-graph-down-arrow"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+            <div>
+                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">TỔNG ĐẦU THUỐC</small>
+                <h4 class="fw-bold text-primary mb-0">@ViewBag.TongSoThuoc loại</h4>
+            </div>
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-primary-subtle text-primary fs-3"
+                 style="width: 48px; height: 48px;">
+                <i class="bi bi-capsule"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="custom-card p-3 d-flex align-items-center justify-content-between">
+            <div>
+                <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem;">CẢNH BÁO TỒN KHO</small>
+                <h4 class="fw-bold text-warning mb-0">@ViewBag.ThuocSapHet <span class="fs-6 text-muted">sắp hết /
+                    @ViewBag.ThuocHetHang trống</span></h4>
                 </div>
-                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-success-subtle text-success fs-3"
+                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-warning-subtle text-warning fs-3"
                      style="width: 48px; height: 48px;">
-                    <i class="bi bi-graph-up-arrow"></i>
+                    <i class="bi bi-exclamation-octagon"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="custom-card p-3 d-flex align-items-center justify-content-between">
-                <div>
-                    <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
-                        GIÁ TRỊ XUẤT</small>
-                        <h4 class="fw-bold text-danger mb-0">@ViewBag.TongTienXuat.ToString("N0")đ</h4>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-8">
+            <div class="custom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-activity text-primary me-2"></i>Biến động giá trị
+                        xuất kho</h5>
+                        <select class="form-select form-select-sm shadow-none w-auto border-secondary-subtle"
+                                onchange="window.location.href='?chartFilter=' + this.value">
+                            @if (ViewBag.CurrentFilter == "day")
+                            {
+                                <option value="day" selected>Theo 7 Ngày qua</option>
+                            }
+                            else
+                            {
+                                <option value="day">Theo 7 Ngày qua</option>
+                            }
+                            @if (ViewBag.CurrentFilter == "week")
+                            {
+                                <option value="week" selected>Theo 4 Tuần qua</option>
+                            }
+                            else
+                            {
+
+                                <option value="week">Theo 4 Tuần qua</option>
+                            }
+                            @if (ViewBag.CurrentFilter == "month" || ViewBag.CurrentFilter == null)
+                            {
+                                <option value="month"
+                                        selected>Theo 6 Tháng qua</option>
+                            }
+                            else
+                            {
+
+                                <option value="month">Theo 6 Tháng qua</option>
+                            }
+                        </select>
                     </div>
-                    <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-danger-subtle text-danger fs-3"
-                         style="width: 48px; height: 48px;">
-                        <i class="bi bi-graph-down-arrow"></i>
+                    <div style="height: 320px; position: relative;">
+                        <canvas id="lineChartTrend"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="custom-card p-3 d-flex align-items-center justify-content-between">
-                    <div>
-                        <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">TỔNG
-                            ĐẦU THUỐC</small>
-                            <h4 class="fw-bold text-primary mb-0">@ViewBag.TongSoThuoc loại</h4>
-                        </div>
-                        <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-primary-subtle text-primary fs-3"
-                             style="width: 48px; height: 48px;">
-                            <i class="bi bi-capsule"></i>
-                        </div>
+
+            <div class="col-md-4">
+                <div class="custom-card p-4">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Top 5 thuốc cấp phát
+                    </h5>
+                    <div style="height: 320px; position: relative;" class="d-flex align-items-center justify-content-center">
+                        <canvas id="pieChartDrugs"></canvas>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="custom-card p-3 d-flex align-items-center justify-content-between">
-                        <div>
-                            <small class="text-muted fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">CẢNH
-                                BÁO TỒN KHO</small>
-                                <h4 class="fw-bold text-warning mb-0">@ViewBag.ThuocSapHet <span class="fs-6 text-muted">sắp hết /
-                                    @ViewBag.ThuocHetHang trống</span></h4>
-                                </div>
-                                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center bg-warning-subtle text-warning fs-3"
-                                     style="width: 48px; height: 48px;">
-                                    <i class="bi bi-exclamation-octagon"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+        </div>
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-8">
-                            <div class="custom-card p-4">
-                                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-activity text-primary me-2"></i>Biến động giá trị xuất
-                                    kho 6 tháng qua</h5>
-                                    <div style="height: 320px; position: relative;">
-                                        <canvas id="lineChartTrend"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="custom-card p-4">
-                                    <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Top 5 thuốc cấp phát
-                                        nhiều nhất</h5>
-                                        <div style="height: 320px; position: relative;" class="d-flex align-items-center justify-content-center">
-                                            <canvas id="pieChartDrugs"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="custom-card p-0 overflow-hidden">
-                                <div class="p-4 border-bottom">
-                                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Lịch sử trích xuất báo
-                                        cáo gần đây</h5>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table mb-0 align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="ps-4">Tên Báo Cáo</th>
-                                                    <th>Loại</th>
-                                                    <th>Giai Đoạn Dữ Liệu</th>
-                                                    <th>Ngày Trích Xuất</th>
-                                                    <th class="pe-4">Mã Tài Khoản Lập</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @if (ViewBag.LichSuBaoCao != null)
-                                                {
-                                                    foreach (var bc in ViewBag.LichSuBaoCao)
-                                                    {
-                                                        <tr>
-                                                            <td class="fw-bold text-dark ps-4">@bc.TenBaoCao</td>
-                                                            <td><span class="badge bg-info-subtle text-info">@bc.LoaiBaoCao</span></td>
-                                                            <td>@bc.TuNgay.ToString("dd/MM/yyyy") - @bc.DenNgay.ToString("dd/MM/yyyy")</td>
-                                                            <td>@bc.NgayLap.ToString("dd/MM/yyyy HH:mm")</td>
-                                                            <td class="pe-4">ID: @bc.MaTaiKhoan</td>
-                                                        </tr>
-                                                    }
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                @section Scripts {
-                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', function () {
-                                        const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-                                        const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
-                                        const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
-
-                                        // ================= CONFIG 1: BIỂU ĐỒ ĐƯỜNG XU HƯỚNG =================
-                                        const xuHuongLabels = @Html.Raw(Json.Serialize(ViewBag.XuHuongLabels));
-                                        const xuHuongData = @Html.Raw(Json.Serialize(ViewBag.XuHuongData));
-
-                                        const ctxLine = document.getElementById('lineChartTrend').getContext('2d');
-                                        new Chart(ctxLine, {
-                                        type: 'line',
-                                        data: {
-                                        labels: xuHuongLabels,
-                                        datasets: [{
-                                        label: 'Giá trị xuất kho (VNĐ)',
-                                        data: xuHuongData,
-                                        borderColor: '#2563EB',
-                                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                                        borderWidth: 3,
-                                        tension: 0.3,
-                                        fill: true,
-                                        pointBackgroundColor: '#2563EB'
-                                        }]
-                                        },
-                                        options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: { legend: { display: false } },
-                                        scales: {
-                                        x: { ticks: { color: textColor }, grid: { display: false } },
-                                        y: {
-                                        ticks: { color: textColor, callback: value => value.toLocaleString('vi-VN') + ' đ' },
-                                        grid: { color: gridColor }
-                                        }
-                                        }
-                                        }
-                                        });
-
-                                        // ================= CONFIG 2: BIỂU ĐỒ TRÒN TOP THUỐC =================
-                                        const topThuocLabels = @Html.Raw(Json.Serialize(ViewBag.TopThuocLabels));
-                                        const topThuocData = @Html.Raw(Json.Serialize(ViewBag.TopThuocData));
-
-                                        const ctxPie = document.getElementById('pieChartDrugs').getContext('2d');
-                                        new Chart(ctxPie, {
-                                        type: 'doughnut',
-                                        data: {
-                                        labels: topThuocLabels,
-                                        datasets: [{
-                                        data: topThuocData,
-                                        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'],
-                                        borderWidth: isDarkMode ? 2 : 1,
-                                        borderColor: isDarkMode ? '#1f2937' : '#ffffff'
-                                        }]
-                                        },
-                                        options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                        legend: { position: 'bottom', labels: { color: textColor, padding: 15, font: { size: 12 } } }
-                                        }
-                                        }
-                                        });
-                                        });
-                                    </script>
+        <div class="custom-card p-0 overflow-hidden">
+            <div class="p-4 border-bottom">
+                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-primary me-2"></i>Lịch sử trích xuất báo
+                    cáo gần đây</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Tên Báo Cáo</th>
+                                <th>Phân Loại</th>
+                                <th>Giai Đoạn Dữ Liệu</th>
+                                <th>Ngày Trích Xuất</th>
+                                <th class="pe-4">Mã Tài Khoản</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.LichSuBaoCao != null)
+                            {
+                                foreach (var bc in ViewBag.LichSuBaoCao)
+                                {
+                                    <tr>
+                                        <td class="fw-bold text-dark ps-4">@bc.TenBaoCao</td>
+                                        <td><span class="badge bg-info-subtle text-info">@bc.LoaiBaoCao</span></td>
+                                        <td>@bc.TuNgay.ToString("dd/MM/yyyy") - @bc.DenNgay.ToString("dd/MM/yyyy")</td>
+                                        <td>@bc.NgayLap.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="pe-4">ID: @bc.MaTaiKhoan</td>
+                                    </tr>
                                 }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            @section Scripts {
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+
+                    // --- JS: TỰ ĐỘNG ĐIỀN NGÀY VÀO FORM BÁO CÁO THEO LOẠI ---
+                    const reportTypeSelect = document.getElementById('reportTypeSelect');
+                    const tuNgayInput = document.getElementById('tuNgayInput');
+                    const denNgayInput = document.getElementById('denNgayInput');
+                    const tenBaoCaoInput = document.getElementById('tenBaoCaoInput');
+
+                    function formatDate(date) {
+                    return date.toISOString().split('T')[0];
+                    }
+
+                    function updateDates() {
+                    const today = new Date();
+                    const type = reportTypeSelect.value;
+                    denNgayInput.value = formatDate(today); // Đến ngày mặc định luôn là hôm nay
+
+                    if (type === 'Ngày') {
+                    tuNgayInput.value = formatDate(today);
+                    tenBaoCaoInput.value = "Báo cáo xuất/nhập kho trong Ngày";
+                    } else if (type === 'Tuần') {
+                    const lastWeek = new Date(today);
+                    lastWeek.setDate(today.getDate() - 7);
+                    tuNgayInput.value = formatDate(lastWeek);
+                    tenBaoCaoInput.value = "Báo cáo kho dược theo Tuần";
+                    } else if (type === 'Tháng') {
+                    const lastMonth = new Date(today);
+                    lastMonth.setMonth(today.getMonth() - 1);
+                    tuNgayInput.value = formatDate(lastMonth);
+                    tenBaoCaoInput.value = "Báo cáo tổng hợp kho theo Tháng";
+                    }
+                    }
+
+                    // Gọi chạy lần đầu khi load trang và khi đổi Dropdown
+                    updateDates();
+                    reportTypeSelect.addEventListener('change', updateDates);
+
+                    // --- JS: BIỂU ĐỒ ĐƯỜNG VÀ TRÒN ---
+                    const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                    const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
+                    const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+
+                    const xuHuongLabels = @Html.Raw(Json.Serialize(ViewBag.XuHuongLabels));
+                    const xuHuongData = @Html.Raw(Json.Serialize(ViewBag.XuHuongData));
+
+                    const ctxLine = document.getElementById('lineChartTrend').getContext('2d');
+                    new Chart(ctxLine, {
+                    type: 'line',
+                    data: {
+                    labels: xuHuongLabels,
+                    datasets: [{
+                    label: 'Giá trị xuất (VNĐ)',
+                    data: xuHuongData,
+                    borderColor: '#2563EB',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#2563EB'
+                    }]
+                    },
+                    options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                    x: { ticks: { color: textColor }, grid: { display: false } },
+                    y: { ticks: { color: textColor, callback: value => value.toLocaleString('vi-VN') + ' đ' }, grid: { color: gridColor } }
+                    }
+                    }
+                    });
+
+                    const topThuocLabels = @Html.Raw(Json.Serialize(ViewBag.TopThuocLabels));
+                    const topThuocData = @Html.Raw(Json.Serialize(ViewBag.TopThuocData));
+
+                    const ctxPie = document.getElementById('pieChartDrugs').getContext('2d');
+                    new Chart(ctxPie, {
+                    type: 'doughnut',
+                    data: {
+                    labels: topThuocLabels,
+                    datasets: [{
+                    data: topThuocData,
+                    backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'],
+                    borderWidth: isDarkMode ? 2 : 1, borderColor: isDarkMode ? '#1f2937' : '#ffffff'
+                    }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor, padding: 15, font: { size: 12 } } } } }
+                    });
+                    });
+                </script>
+            }
