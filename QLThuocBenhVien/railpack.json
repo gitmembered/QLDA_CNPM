@@ -1,0 +1,5 @@
+{ 
+  "build": { 
+    "cmd": "dotnet restore --no-cache && dotnet publish -c Release -o out" 
+  } 
+}
