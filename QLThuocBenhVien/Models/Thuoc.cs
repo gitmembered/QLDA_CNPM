@@ -23,10 +23,12 @@ namespace QLThuocBenhVien.Models
         // Đã bổ sung GiaNhap
         [Required]
         [Range(0, double.MaxValue)]
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal GiaNhap { get; set; }
 
         [Required]
         [Range(0, double.MaxValue)]
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal GiaBan { get; set; }
 
         [Required]

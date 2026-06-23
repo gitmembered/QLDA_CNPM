@@ -231,3 +231,9 @@ C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\refint\QLThuocBenhVien.dll
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.pdb
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\QLThuocBenhVien.genruntimeconfig.cache
 C:\QLDA_CNPM\QLThuocBenhVien\obj\Debug\net10.0\ref\QLThuocBenhVien.dll
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\web.config
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\appsettings.Development.json
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\appsettings.json
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\QLThuocBenhVien.deps.json
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\QLThuocBenhVien.runtimeconfig.json
+C:\QLDA_CNPM\QLThuocBenhVien\bin\Debug\net10.0\publish_folder\QLThuocBenhVien.staticwebassets.endpoints.json

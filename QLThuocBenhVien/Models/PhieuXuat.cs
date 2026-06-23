@@ -17,6 +17,7 @@ namespace QLThuocBenhVien.Models
 
         public int MaTaiKhoan { get; set; }
 
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal TongTien { get; set; }
 
         public string LyDoXuat { get; set; }

@@ -11,6 +11,8 @@ namespace QLThuocBenhVien.Models
         public DateTime NgayNhap { get; set; }
         public string? GhiChu { get; set; }
         public int MaNCC { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
         public decimal TongTien { get; set; }
 
         [ForeignKey("MaNCC")]
