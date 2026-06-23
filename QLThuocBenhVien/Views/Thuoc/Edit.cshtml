@@ -12,8 +12,11 @@
     <form asp-action="Edit" method="post">
         @Html.AntiForgeryToken()
 
+        <div asp-validation-summary="All" class="text-danger fw-bold mb-3"></div>
+
         <input type="hidden" asp-for="MaThuoc" />
         <input type="hidden" asp-for="SoLuongTon" />
+        <input type="hidden" asp-for="MaNCC" />
 
         <div class="row g-3">
             <div class="col-md-6">
@@ -21,29 +24,35 @@
                     class="text-danger">*</span></label>
                     <input asp-for="TenThuoc" class="form-control shadow-none" required />
                 </div>
+
                 <div class="col-md-6">
                     <label class="form-label fw-bold text-dark">Tên các hoạt chất chính <span
                         class="text-danger">*</span></label>
                         <input asp-for="HoatChat" class="form-control shadow-none" required />
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark">Giá Nhập (VNĐ)</label>
                         <input asp-for="GiaNhap" type="number" min="0" class="form-control shadow-none" required />
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark">Giá Bán / Xuất (VNĐ)</label>
                         <input asp-for="GiaBan" type="number" min="0" class="form-control shadow-none" required />
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark">Hạn Sử Dụng</label>
                         <input asp-for="HanSuDung" type="date" class="form-control shadow-none" required />
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-dark">Đơn vị tính gốc <span class="text-danger">*</span></label>
                         <select asp-for="MaDVT" class="form-select shadow-none" asp-items="ViewBag.DonViTinhList" required>
                             <option value="">-- Chọn đơn vị tính --</option>
                         </select>
                     </div>
+
                     <div class="col-md-8">
                         <label class="form-label fw-bold text-dark">Nhóm bệnh khuyên dùng / Điều trị <span
                             class="text-danger">*</span></label>
@@ -51,6 +60,7 @@
                                 <option value="">-- Chọn nhóm bệnh điều trị chính --</option>
                             </select>
                         </div>
+
                         <div class="col-md-12">
                             <label class="form-label fw-bold text-dark">Công Dụng / Chỉ Định Điều Trị</label>
                             <textarea asp-for="CongDung" class="form-control shadow-none" rows="3"></textarea>
@@ -59,8 +69,9 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                         <a asp-action="Index" class="btn btn-light px-4">Hủy thay đổi</a>
-                        <button type="submit" class="btn btn-primary px-4 fw-medium"><i class="bi bi-save me-2"></i>Lưu cập
-                            nhật</button>
-                        </div>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn-primary px-4 fw-medium">
+                            <i class="bi bi-save me-2"></i>Lưu cập nhật
+                        </button>
+                    </div>
+                </form>
+            </div>

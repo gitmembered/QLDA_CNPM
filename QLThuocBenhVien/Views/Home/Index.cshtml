@@ -134,28 +134,39 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content custom-card p-0">
             <div class="modal-header border-bottom bg-danger-subtle">
-                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Danh sách
-                    thuốc sắp hết hàng</h5>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">Tên Thuốc</th>
-                                <th>Đơn Vị</th>
-                                <th class="text-danger">Tồn Kho Hiện Tại</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (ViewBag.SapHetHangList != null)
+                <h5 class="modal-title fw-bold text-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Danh sách thuốc sắp hết hàng
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Tên Thuốc</th>
+                            <th>Đơn Vị</th>
+                            <th>Tồn Kho Hiện Tại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.SapHetHangList != null)
+                        {
+                            foreach (var thuoc in ViewBag.SapHetHangList)
                             {
-                                foreach (var thuoc in ViewBag.SapHetHangList)
-                                {
-                                    <tr>
-                                        <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
-                                        <td>@thuoc.DonViTinh</td>
-                                        <td class="fw-bold text-danger">@thuoc.SoLuongTon (Sắp hết)</td>
+                                <tr>
+                                    <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
+                                    <td>@thuoc.DonViTinh</td>
+                                    <td>
+                                        @if (thuoc.SoLuongTon == 0)
+                                        {
+                                            <span class="text-danger fw-bold">@thuoc.SoLuongTon (Hết hàng)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-warning fw-bold" style="color: #fd7e14 !important;">@thuoc.SoLuongTon
+                                                (Sắp hết)</span>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             }
@@ -170,83 +181,81 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content custom-card p-0">
                 <div class="modal-header border-bottom bg-warning-subtle">
-                    <h5 class="modal-title fw-bold text-warning-emphasis"><i class="bi bi-clock-history me-2"></i>Danh
-                        sách
-                        thuốc sắp/đã hết hạn</h5>
-                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body p-4 text-center">
-                        @if (ViewBag.SapHetHanList == null || ViewBag.SapHetHanCount == 0)
-                        {
-                            <p class="text-muted mb-0">Hệ thống ghi nhận không có lô thuốc nào sắp hết hạn trong 30 ngày tới.
-                            </p>
-                        }
-                        else
-                        {
-                            <table class="table table-hover mb-0 text-start">
-                                <thead class="table-light">
+                    <h5 class="modal-title fw-bold text-warning-emphasis">
+                        <i class="bi bi-clock-history me-2"></i>Danh sách thuốc sắp/đã hết hạn
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    @if (ViewBag.SapHetHanList == null || ViewBag.SapHetHanCount == 0)
+                    {
+                        <p class="text-muted mb-0">Hệ thống ghi nhận không có lô thuốc nào sắp hết hạn trong 30 ngày tới.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-hover mb-0 text-start">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Tên Thuốc</th>
+                                    <th>Hạn Sử Dụng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var thuoc in ViewBag.SapHetHanList)
+                                {
                                     <tr>
-                                        <th class="ps-4">Tên Thuốc</th>
-                                        <th>Hạn Sử Dụng</th>
+                                        <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
+                                        <td>@thuoc.HanSuDung.ToString("dd/MM/yyyy")</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var thuoc in ViewBag.SapHetHanList)
-                                    {
-                                        <tr>
-                                            <td class="ps-4 fw-bold">@thuoc.TenThuoc</td>
-                                            <td>@thuoc.HanSuDung.ToString("dd/MM/yyyy")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
+                                }
+                            </tbody>
+                        </table>
+                    }
                 </div>
             </div>
         </div>
+    </div>
 
-        @section Scripts {
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                // Lấy nhãn (Tên nhóm bệnh) và dữ liệu (Số lượng) từ C# Backend truyền xuống
-                const chartLabels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
-                const chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            const chartLabels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+            const chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
 
-                const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-                const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
-                const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            const textColor = isDarkMode ? '#9CA3AF' : '#4B5563';
+            const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
 
-                const ctxBar = document.getElementById('barChart').getContext('2d');
-                new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                labels: chartLabels, // Đã hiển thị đúng tên Nhóm bệnh
-                datasets: [{
-                label: 'Số đầu thuốc',
-                data: chartData,
-                backgroundColor: '#2563EB',
-                borderRadius: 4,
-                barPercentage: 0.4
-                }]
-                },
-                options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                x: {
-                ticks: { color: textColor },
-                grid: { display: false }
-                },
-                y: {
-                ticks: { color: textColor, stepSize: 1 },
-                grid: { color: gridColor, borderDash: [5, 5] }
-                }
-                }
-                }
-                });
-                });
-            </script>
-        }
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+            labels: chartLabels,
+            datasets: [{
+            label: 'Số đầu thuốc',
+            data: chartData,
+            backgroundColor: '#2563EB',
+            borderRadius: 4,
+            barPercentage: 0.4
+            }]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+            x: {
+            ticks: { color: textColor },
+            grid: { display: false }
+            },
+            y: {
+            ticks: { color: textColor, stepSize: 1 },
+            grid: { color: gridColor, borderDash: [5, 5] }
+            }
+            }
+            }
+            });
+            });
+        </script>
+    }
