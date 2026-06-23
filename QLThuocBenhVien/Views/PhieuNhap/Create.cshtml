@@ -35,127 +35,142 @@
         <div class="custom-card">
             <h5 class="fw-bold border-bottom pb-2 mb-3 text-dark"><i class="bi bi-box-seam me-2 text-primary"></i>Chi tiết
                 hàng nhập</h5>
-                <div class="table-responsive" style="overflow-x: visible;">
-                    <table class="table table-borderless mb-2" id="chiTietTable">
-                        <thead>
-                            <tr class="text-muted" style="font-size: 0.85rem; letter-spacing: 0.5px;">
-                                <th width="35%">TÊN THUỐC</th>
-                                <th width="20%">ĐƠN VỊ TÍNH</th>
-                                <th width="15%">SỐ LƯỢNG</th>
-                                <th width="20%">ĐƠN GIÁ (VNĐ)</th>
-                                <th width="10%">THÀNH TIỀN</th>
-                                <th width="5%"></th>
+                <div class="table-responsive" style="overflow: visible;">
+                    <table class="table align-middle" id="importTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 35%">Dược phẩm trong danh mục</th>
+                                <th style="width: 12%">Số lượng</th>
+                                <th style="width: 15%">Đơn giá nhập</th>
+                                <th style="width: 15%">Đơn giá xuất</th>
+                                <th style="width: 18%">Thành tiền nhập</th>
+                                <th style="width: 5%" class="text-center">#</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="text" class="form-control" name="TenThuoc[]" placeholder="Nhập tên thuốc..."
-                                               required></td>
-                                    <td>
-                                        <select class="form-select text-dark" name="MaDVT[]" asp-items="ViewBag.DonViTinhList"
-                                                required>
-                                            <option value="">-- Chọn ĐVT --</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="number" class="form-control input-qty" name="SoLuong[]" value="1" min="1"
-                                                   required></td>
-                                        <td><input type="number" class="form-control input-price" name="DonGia[]" value="0" min="0"
-                                                       required></td>
-                                            <td class="align-middle fw-bold row-total text-primary">0 đ</td>
-                                            <td class="align-middle text-end"><i
-                                                class="bi bi-trash text-danger cursor-pointer btn-delete-row"
-                                                style="cursor: pointer; font-size: 1.2rem;"></i></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <tr class="import-row">
+                                <td>
+                                    <select name="MaThuoc[]" class="form-select drug-select shadow-none" required>
+                                        <option value="">-- Gõ tên thuốc để tìm --</option>
+                                        @foreach (var t in ViewBag.ThuocDanhMucList)
+                                        {
+                                            <option value="@t.MaThuoc" data-giaxuat="@t.GiaBan">@t.TenThuoc (@t.HoatChat)</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input type="number" name="SoLuong[]" class="form-control qty-input shadow-none" min="1"
+                                               value="1" required /></td>
+                                    <td><input type="number" name="DonGiaNhap[]" class="form-control price-input shadow-none"
+                                                   min="0" required /></td>
+                                        <td><input type="number" name="DonGiaXuat[]" class="form-control sale-input shadow-none" min="0"
+                                                       required /></td>
+                                            <td><input type="text" class="form-control row-total shadow-none bg-light fw-bold text-dark"
+                                                           value="0 đ" readonly /></td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-link text-danger p-0 delete-row shadow-none"><i
+                                                        class="bi bi-trash fs-5"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                                    <button type="button" id="btnAddRow" class="btn btn-outline-primary bg-transparent btn-sm px-3 fw-medium"
-                                            style="border-radius: 8px;">
-                                        <i class="bi bi-plus me-1"></i> Thêm Dòng Khác
-                                    </button>
-                                    <div class="fs-5">
-                                        <span class="text-muted me-2 fs-6">Tổng cộng:</span>
-                                        <span class="fw-bold text-danger fs-4" id="grandTotal">0 đ</span>
+                                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                                        <button type="button" id="btnAddRow" class="btn btn-outline-primary bg-transparent btn-sm px-3 fw-medium"
+                                                style="border-radius: 8px;">
+                                            <i class="bi bi-plus me-1"></i> Thêm Dòng Khác
+                                        </button>
+                                        <div class="fs-5">
+                                            <span class="text-muted me-2 fs-6">Tổng cộng:</span>
+                                            <span class="fw-bold text-danger fs-4" id="grandTotal">0 đ</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="text-end mt-4">
-                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm" style="border-radius: 8px;">
-                                    <i class="bi bi-floppy me-2"></i> Lưu Phiếu Nhập
-                                </button>
-                            </div>
-                        </form>
+                                <div class="text-end mt-4">
+                                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm" style="border-radius: 8px;">
+                                        <i class="bi bi-floppy me-2"></i> Lưu Phiếu Nhập
+                                    </button>
+                                </div>
+                            </form>
 
-                        @section Scripts {
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const tableBody = document.querySelector('#chiTietTable tbody');
-                                    const btnAddRow = document.getElementById('btnAddRow');
-                                    const grandTotalEl = document.getElementById('grandTotal');
+                            @section Scripts {
+                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+                                <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-                                    // 1. Hàm tính toán lại tổng tiền
-                                    function calculateTotals() {
-                                        let grandTotal = 0;
-                                        const rows = tableBody.querySelectorAll('tr');
-
-                                        rows.forEach(row => {
-                                            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-                                            const price = parseFloat(row.querySelector('.input-price').value) || 0;
-                                            const total = qty * price;
-
-                                            row.querySelector('.row-total').textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
-                                            grandTotal += total;
-                                        });
-
-                                        grandTotalEl.textContent = new Intl.NumberFormat('vi-VN').format(grandTotal) + ' đ';
+                                <script>
+                                    $(document).ready(function () {
+                                    function initSelect2(element) {
+                                    element.select2({
+                                    theme: 'bootstrap-5',
+                                    width: '100%',
+                                    placeholder: '-- Gõ tên thuốc để tìm --'
+                                    });
                                     }
 
-                                    // 2. Lắng nghe thay đổi để tính tiền tự động
-                                    tableBody.addEventListener('input', function (e) {
-                                        if (e.target.classList.contains('input-qty') || e.target.classList.contains('input-price')) {
-                                            calculateTotals();
-                                        }
+                                    initSelect2($('.drug-select'));
+
+                                    function calculateTotals() {
+                                    let grandTotal = 0;
+                                    $('#importTable tbody .import-row').each(function () {
+                                    const row = $(this);
+                                    const qty = parseFloat(row.find('.qty-input').val()) || 0;
+                                    const price = parseFloat(row.find('.price-input').val()) || 0;
+                                    const rowTotal = qty * price;
+
+                                    row.find('.row-total').val(rowTotal.toLocaleString('vi-VN') + " đ");
+                                    grandTotal += rowTotal;
                                     });
+                                    $('#grandTotal').text(grandTotal.toLocaleString('vi-VN') + " đ");
+                                    }
 
-                                    // 3. Xử lý nút Thêm Dòng
-                                    btnAddRow.addEventListener('click', function () {
-                                        // Javascript sẽ clone nguyên dòng đầu tiên (bao gồm cả danh sách Option lấy từ Database)
-                                        const firstRow = tableBody.querySelector('tr');
-                                        const newRow = firstRow.cloneNode(true);
-
-                                        // Làm sạch các ô nhập liệu của dòng mới
-                                        newRow.querySelectorAll('input').forEach(input => {
-                                            if (input.type === 'number') {
-                                                input.value = input.classList.contains('input-qty') ? '1' : '0';
-                                            } else {
-                                                input.value = '';
-                                            }
-                                        });
-                                        newRow.querySelector('select').selectedIndex = 0; // Trả dropdown về "-- Chọn ĐVT --"
-                                        newRow.querySelector('.row-total').textContent = '0 đ';
-
-                                        tableBody.appendChild(newRow);
-                                        calculateTotals();
-                                    });
-
-                                    // 4. Xử lý nút Xóa Dòng
-                                    tableBody.addEventListener('click', function (e) {
-                                        if (e.target.classList.contains('btn-delete-row')) {
-                                            const rowCount = tableBody.querySelectorAll('tr').length;
-                                            if (rowCount > 1) {
-                                                e.target.closest('tr').remove();
-                                                calculateTotals();
-                                            } else {
-                                                alert('Phải giữ lại ít nhất 1 dòng để lập phiếu!');
-                                            }
-                                        }
-                                    });
-
-                                    // Tính toán lần đầu khi vừa mở trang
+                                    $('#importTable').on('change', '.drug-select', function () {
+                                    const row = $(this).closest('.import-row');
+                                    const selectedOption = $(this).find('option:selected');
+                                    const giaXuatDb = selectedOption.data('giaxuat') || 0;
+                                    row.find('.sale-input').val(giaXuatDb);
                                     calculateTotals();
-                                });
-                            </script>
-                        }
+                                    });
+
+                                    $('#importTable').on('input', '.qty-input, .price-input', function () {
+                                    calculateTotals();
+                                    });
+
+                                    // ================= ĐÃ SỬA LẠI LOGIC THÊM DÒNG TỐI ƯU =================
+                                    $('#btnAddRow').click(function () {
+                                    const tableBody = $('#importTable tbody');
+
+                                    // 1. Phá hủy Select2 của dòng đầu tiên để lấy HTML sạch (không dính ID ngầm)
+                                    const firstSelect = tableBody.find('.import-row:first .drug-select');
+                                    firstSelect.select2('destroy');
+
+                                    // 2. Clone dòng đầu tiên (lúc này là thẻ <select> thuần túy)
+                                    const newRow = tableBody.find('.import-row:first').clone();
+
+                                    // 3. Reset các giá trị để nhập mới
+                                    newRow.find('.drug-select').val('');
+                                    newRow.find('.qty-input').val(1);
+                                    newRow.find('.price-input').val('');
+                                    newRow.find('.sale-input').val('');
+                                    newRow.find('.row-total').val('0 đ');
+
+                                    // 4. Thêm vào bảng
+                                    tableBody.append(newRow);
+
+                                    // 5. Kích hoạt lại Select2 cho TOÀN BỘ các thẻ trong bảng (cả dòng 1 vừa bị hủy lẫn dòng mới)
+                                    initSelect2($('.drug-select'));
+                                    calculateTotals();
+                                    });
+
+                                    $('#importTable').on('click', '.delete-row', function () {
+                                    if ($('#importTable tbody .import-row').length > 1) {
+                                    $(this).closest('.import-row').remove();
+                                    calculateTotals();
+                                    } else {
+                                    alert('Hóa đơn nhập kho phải có ít nhất một mặt hàng!');
+                                    }
+                                    });
+                                    });
+                                </script>
+                            }

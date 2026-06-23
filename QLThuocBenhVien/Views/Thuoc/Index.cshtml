@@ -59,30 +59,53 @@
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
         <h3 class="fw-bold mb-1">Danh Mục Kho Thuốc</h3>
         <p class="text-muted mb-0">Quản lý và theo dõi tồn kho của bệnh viện.</p>
     </div>
-    <a asp-controller="Thuoc" asp-action="Create" class="btn btn-primary px-4 fw-medium shadow-sm"
-       style="border-radius: 8px;">
-        <i class="bi bi-plus-lg me-2"></i>Thêm Mới
+    <a asp-action="Create" class="btn btn-primary px-4 shadow-sm" style="border-radius: 8px;">
+        <i class="bi bi-plus-lg me-2"></i> Thêm Mới
     </a>
 </div>
 
-<div class="custom-card p-0 overflow-hidden">
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2 fs-5 align-middle"></i>
+        <span class="fw-medium">@TempData["SuccessMessage"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-    <div class="p-4 border-bottom bg-light">
-        <form method="get" asp-action="Index" id="filterForm">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0 text-muted"><i
-                            class="bi bi-search"></i></span>
-                            <input type="text" name="searchString" value="@ViewData["CurrentSearch"]"
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2 fs-5 align-middle"></i>
+        <span class="fw-medium">@TempData["ErrorMessage"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="custom-card mb-4">
+    <div class="p-4">
+        <h5 class="fw-bold mb-1">Bộ lọc tìm kiếm</h5>
+        <p class="text-muted mb-0">Tìm kiếm thuốc theo tên, hoạt chất hoặc lọc theo nhóm bệnh và trạng thái tồn kho.</p>
+    </div>
+
+    <div class="custom-card p-0 overflow-hidden">
+
+        <div class="p-4 border-bottom bg-light">
+            <form method="get" asp-action="Index" id="filterForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="txtSearchString" name="searchString"
+                                   value="@ViewData["CurrentSearch"]"
                                    class="form-control border-start-0 ps-0 shadow-none bg-transparent"
-                                   placeholder="Tìm kiếm thuốc theo tên..."
-                                   onkeypress="if(event.keyCode==13){ this.form.submit(); }">
+                                   placeholder="Tìm kiếm thuốc theo tên hoặc hoạt chất...">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -94,105 +117,122 @@
                     <div class="col-md-3">
                         <select name="trangThai" class="form-select shadow-none"
                                 onchange="document.getElementById('filterForm').submit();">
-                            <option value="">Tất cả trạng thái</option>
-                            @if (ViewData["CurrentTrangThai"]?.ToString() == "AnToan")
-                            {
-                                <option value="AnToan" selected>An
-                                    toàn (> 50)</option>
-                                } else
-                                {
+                            <option value="">-- Tất cả trạng thái --</option>
 
-                                    <option value="AnToan">An toàn (> 50)</option>
-                                }
-                                @if (ViewData["CurrentTrangThai"]?.ToString() == "SapHet")
-                                {
-                                    <option value="SapHet" selected>Sắp
-                                        hết hàng (1 - 50)</option>
-                                    } else
-                                    {
+                            <option value="AnToan" selected="@(ViewData["CurrentTrangThai"]?.ToString() == "AnToan")">
+                                An toàn (> 50)
+                            </option>
 
-                                        <option value="SapHet">Sắp hết hàng (1 - 50)</option>
-                                    }
-                                    @if (ViewData["CurrentTrangThai"]?.ToString() == "HetHang")
-                                    {
-                                        <option value="HetHang" selected>
-                                            Hết hàng (0)</option>
-                                        } else
-                                        {
+                            <option value="SapHetHang"
+                                    selected="@(ViewData["CurrentTrangThai"]?.ToString() == "SapHetHang")">
+                                Sắp hết hàng (1 - 50)
+                            </option>
 
-                                            <option value="HetHang">Hết hàng (0)</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
+                            <option value="HetHang" selected="@(ViewData["CurrentTrangThai"]?.ToString() == "HetHang")">
+                                Hết hàng (0)
+                            </option>
+
+                            <option value="SapHetHan"
+                                    selected="@(ViewData["CurrentTrangThai"]?.ToString() == "SapHetHan")">
+                                Sắp hết hạn (<= 90 ngày) </option>
+
+                                <option value="DaHetHan"
+                                        selected="@(ViewData["CurrentTrangThai"]?.ToString() == "DaHetHan")">
+                                    Đã hết hạn
+                                </option>
+                            </select>
+                        </div>
                     </div>
+                </form>
+            </div>
 
-                    <div class="table-responsive">
-                        <table class="table mb-0 align-middle">
-                            <thead>
-                                <tr>
-                                    <th class="ps-4">Mã</th>
-                                    <th>Tên Thuốc</th>
-                                    <th>Nhóm Bệnh</th>
-                                    <th>Tồn Kho</th>
-                                    <th>Trạng Thái</th>
-                                    <th class="text-end pe-4">Thao Tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model != null && Model.Any())
-                                {
-                                    foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td class="fw-bold text-primary ps-4">MED-@item.MaThuoc.ToString("D3")</td>
-                                            <td class="fw-bold text-dark">@item.TenThuoc</td>
-                                            <td>
-                                                @if (item.ThuocNhomBenhs != null && item.ThuocNhomBenhs.Any())
-                                                {
-                                                    <span
-                                                    class="badge bg-secondary-subtle text-secondary">@item.ThuocNhomBenhs.First().NhomBenh.TenNhomBenh</span>
-                                                }
-                                            </td>
-                                            <td class="fw-bold">@item.SoLuongTon</td>
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Mã</th>
+                            <th>Tên Thuốc</th>
+                            <th>Nhóm Bệnh</th>
+                            <th>Tồn Kho</th>
+                            <th>Trạng Thái</th>
+                            <th class="text-end pe-4">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr class="drug-item-row" style="cursor: pointer;" data-bs-toggle="modal"
+                                    data-bs-target="#drugDetailsModal" data-ten="@item.TenThuoc" data-hoatchat="@item.HoatChat"
+                                    data-nhom="@(item.ThuocNhomBenhs?.FirstOrDefault()?.NhomBenh?.TenNhomBenh ?? "Chưa phân nhóm")"
+                                    data-soluong="@item.SoLuongTon" data-dvt="@item.DonViTinh?.TenDVT"
+                                    data-congdung="@item.CongDung" data-giaban="@item.GiaBan"
+                                    data-han="@(item.HanSuDung != DateTime.MinValue ? item.HanSuDung.ToString("dd/MM/yyyy") : "Chưa cập nhật")">
 
-                                            <td>
-                                                @if (item.SoLuongTon == 0)
-                                                {
-                                                    <span class="status-badge status-critical"><i class="bi bi-x-octagon me-1"></i>Hết hàng</span>
+                                    <td class="fw-bold text-primary ps-4">MED-@item.MaThuoc.ToString("D3")</td>
+
+                                    <td>
+                                        <div class="fw-bold text-dark text-hover-underline">@item.TenThuoc</div>
+                                        <small class="text-muted">@item.HoatChat</small>
+                                    </td>
+
+                                    <td>
+                                        @if (item.ThuocNhomBenhs != null && item.ThuocNhomBenhs.Any())
+                                        {
+                                            <span
+                                            class="badge bg-secondary-subtle text-secondary">@item.ThuocNhomBenhs.First().NhomBenh.TenNhomBenh</span>
+                                        }
+                                    </td>
+
+                                    <td class="fw-bold">@item.SoLuongTon @item.DonViTinh?.TenDVT</td>
+
+                                    <td>
+                                        @if (item.HanSuDung != DateTime.MinValue && item.HanSuDung.Date < DateTime.Now.Date)
+                                        {
+                                            <span class="status-badge bg-dark text-white border border-danger"><i
+                                                class="bi bi-x-octagon me-1"></i>Đã hết hạn</span>
+                                            }
+                                            else if (item.HanSuDung != DateTime.MinValue && item.HanSuDung.Date <=
+                        DateTime.Now.AddDays(90).Date)
+                                            {
+                                                <span class="status-badge status-warning"><i class="bi bi-clock-history me-1"></i>Sắp hết
+                                                    hạn</span>
                                                 }
-                                                else if (item.HanSuDung != DateTime.MinValue && item.HanSuDung <= DateTime.Now.AddDays(30))
+                                            else if (item.SoLuongTon == 0)
                                                 {
-                                                    <span class="status-badge status-warning"><i class="bi bi-clock-history me-1"></i>Sắp hết
-                                                        hạn</span>
+                                                    <span class="status-badge status-critical"><i class="bi bi-exclamation-circle me-1"></i>Hết
+                                                        hàng</span>
                                                     }
-                                                else if (item.SoLuongTon <= 50)
+                                            else if (item.SoLuongTon <= 50)
                                                     {
-                                                        <span class="status-badge status-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sắp hết
+                                                        <span class="status-badge status-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sắp
+                                                            hết
                                                             hàng</span>
                                                         }
-                                                else
+                                            else
                                                         {
                                                             <span class="status-badge status-safe"><i class="bi bi-check-circle me-1"></i>An toàn</span>
                                                         }
                                                     </td>
 
-                                                    <td class="text-end pe-4">
-                                                        <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-primary me-2"
-                                                           title="Chỉnh sửa">
+                                                    <td class="text-end pe-4" onclick="event.stopPropagation();">
+                                                        <a asp-action="Edit" asp-route-id="@item.MaThuoc"
+                                                           class="btn btn-sm btn-light text-primary me-2" title="Chỉnh sửa">
                                                             <i class="bi bi-pencil"></i>
                                                         </a>
-                                                        <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-light text-danger"
-                                                           title="Xóa"
-                                                           onclick="return confirm('Bạn có chắc chắn muốn xóa thuốc @item.TenThuoc khỏi hệ thống?');">
-                                                            <i class="bi bi-trash"></i>
-                                                        </a>
+
+                                                        <form asp-action="Delete" asp-route-id="@item.MaThuoc" method="post" class="d-inline"
+                                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa thuốc @item.TenThuoc khỏi hệ thống?');">
+                                                            <button type="submit" class="btn btn-sm btn-light text-danger shadow-none" title="Xóa">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             }
                                         }
-                                else
+                                        else
                                         {
                                             <tr>
                                                 <td colspan="6" class="text-center py-5 text-muted">
@@ -204,5 +244,142 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div> ```
+                        </div>
+
+                        <div class="modal fade" id="drugDetailsModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content custom-card p-0 overflow-hidden border-0 shadow-lg">
+                                    <div class="modal-header bg-primary text-white p-4">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width: 48px; height: 48px;">
+                                                <i class="bi bi-capsule-capsule fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="modal-title fw-bold mb-0" id="modalTenThuoc">Tên thuốc</h5>
+                                                <small class="opacity-75" id="modalHoatChat">Hoạt chất điều trị</small>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close btn-close-white shadow-none"
+                                                data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4 bg-body-secondary text-body">
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                    <small class="text-muted d-block mb-1 fs-xs fw-bold text-uppercase">Nhóm bệnh khuyên
+                                                        dùng</small>
+                                                        <span class="fw-bold fs-6 text-body" id="modalNhomBenh">--</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                        <small class="text-muted d-block mb-1 fs-xs fw-bold text-uppercase">Đơn Giá Bán / Xuất
+                                                            Kho</small>
+                                                            <span class="fw-bold text-success fs-5" id="modalGiaBan">0 đ</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                            <small class="text-muted d-block mb-1 fs-xs fw-bold text-uppercase">Hạn sử dụng
+                                                                lô</small>
+                                                                <span class="fw-bold text-danger fs-6" id="modalHanSuDung">--</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                                <small class="text-muted d-block mb-1 fs-xs fw-bold text-uppercase">Đơn vị tính
+                                                                    gốc</small>
+                                                                    <span class="fw-semibold text-body" id="modalDVT">--</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                                    <small class="text-muted d-block mb-1 fs-xs fw-bold text-uppercase">Tồn kho thực
+                                                                        tế</small>
+                                                                        <span class="fw-bold text-primary fs-5" id="modalSoLuong">0</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="p-3 bg-body rounded-3 border shadow-sm">
+                                                                        <small class="text-muted d-block mb-2 fs-xs fw-bold text-uppercase">Công Dụng / Chỉ Định
+                                                                            Điều Trị Lâm Sàng</small>
+                                                                            <p class="mb-0 lh-sm fs-sm text-body" style="white-space: pre-line;" id="modalCongDung">
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @section Scripts {
+                                                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                                    <script>
+                                                        $(document).ready(function () {
+
+                                                        // Kiểm tra xem hiện tại trang có đang bị lọc bởi Server-side (URL) không
+                                                        const isServerSearched = "@ViewData["CurrentSearch"]" !== "";
+
+                                                        // ==================== BỘ LỌC TÌM KIẾM THÔNG MINH ====================
+                                                        $('#txtSearchString').on('input keyup', function () {
+                                                        const keyword = $(this).val().toLowerCase().trim();
+
+                                                        // TRƯỜNG HỢP Ô TÌM KIẾM BỊ XOÁ TRỐNG TRƠN
+                                                        if (keyword === "") {
+                                                        if (isServerSearched) {
+                                                        // Nếu trang đã bị reload từ trước (chỉ có vài thuốc khớp từ khóa),
+                                                        // tự động submit lại form để Server tải lại danh sách thuốc cũ đầy đủ
+                                                        $('#filterForm').submit();
+                                                        } else {
+                                                        // Nếu chỉ lọc nhanh dưới Client, hiển thị lại toàn bộ dòng đang có
+                                                        $('.drug-item-row').show();
+                                                        }
+                                                        return;
+                                                        }
+
+                                                        // TRƯỜNG HỢP ĐANG GÕ CHỮ (TÌM KIẾM TỨC THỜI)
+                                                        $('.drug-item-row').each(function () {
+                                                        const row = $(this);
+                                                        const tenThuoc = row.data('ten') ? row.data('ten').toString().toLowerCase() : '';
+                                                        const hoatChat = row.data('hoatchat') ? row.data('hoatchat').toString().toLowerCase() : '';
+
+                                                        if (tenThuoc.includes(keyword) || hoatChat.includes(keyword)) {
+                                                        row.show();
+                                                        } else {
+                                                        row.hide();
+                                                        }
+                                                        });
+                                                        });
+
+                                                        // Logic đổ dữ liệu vào Modal khi click xem chi tiết thuốc (Giữ nguyên phần cũ)
+                                                        // Logic đổ dữ liệu vào Modal khi click xem chi tiết thuốc
+                                                        $('.drug-item-row').click(function () {
+                                                        const btn = $(this);
+                                                        $('#modalTenThuoc').text(btn.data('ten'));
+                                                        $('#modalHoatChat').text('Hoạt chất: ' + btn.data('hoatchat'));
+                                                        $('#modalNhomBenh').text(btn.data('nhom'));
+                                                        $('#modalDVT').text(btn.data('dvt'));
+                                                        $('#modalSoLuong').text(btn.data('soluong') + ' ' + btn.data('dvt'));
+                                                        $('#modalHanSuDung').text(btn.data('han'));
+
+                                                        // --- ĐÃ BỔ SUNG LẠI: HÚT VÀ HIỂN THỊ GIÁ BÁN ---
+                                                        const giaBan = parseFloat(btn.data('giaban')) || 0;
+                                                        $('#modalGiaBan').text(giaBan.toLocaleString('vi-VN') + ' đ');
+                                                        // ----------------------------------------------
+
+                                                        const congDungText = btn.data('congdung');
+                                                        if (congDungText && congDungText.trim() !== '') {
+                                                        $('#modalCongDung').text(congDungText);
+                                                        } else {
+                                                        $('#modalCongDung').text('Chưa có thông tin chỉ định y khoa cụ thể cho dược phẩm này.');
+                                                        }
+                                                        });
+                                                        });
+                                                    </script>
+                                                }
+                                            </table>
+                                        </div>
+                                    </div>
 

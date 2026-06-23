@@ -213,6 +213,39 @@
                 color: #f87171 !important;
                 background-color: transparent !important;
             }
+
+            /* ================= FIX SELECT2 CHO DARK MODE ================= */
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown {
+                background-color: #1e293b;
+                border-color: #334155;
+            }
+
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option {
+                color: #f8fafc;
+                /* Màu chữ trắng sáng */
+            }
+
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
+                background-color: #3b82f6 !important;
+                /* Xanh dương khi hover */
+                color: white !important;
+            }
+
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-search__field {
+                background-color: #0f172a;
+                color: #f8fafc;
+                border-color: #334155;
+            }
+
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+            }
+
+            [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection__rendered {
+                color: #f8fafc !important;
+                /* Chữ đang hiển thị ô chọn */
+            }
     </style>
 </head>
 

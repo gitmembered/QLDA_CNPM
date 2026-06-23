@@ -21,4 +21,5 @@ namespace QLThuocBenhVien.Models
         [ForeignKey("MaDVT")]
         public virtual DonViTinh? DonViTinh { get; set; }
     }
+
 }

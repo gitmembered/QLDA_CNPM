@@ -1,71 +1,66 @@
 @model QLThuocBenhVien.Models.Thuoc
 @{
-    ViewData["Title"] = "Cập Nhật Thuốc";
+    ViewData["Title"] = "Cập Nhật Thông Tin Thuốc";
 }
 
 <div class="mb-4">
-    <h3 class="fw-bold mb-1">Cập Nhật Thông Tin Thuốc</h3>
-    <p class="text-muted">Chỉnh sửa thông tin chi tiết của thuốc đang có trong hệ thống.</p>
+    <h3 class="fw-bold mb-1">Cập Nhật Thông Tin Dược Phẩm</h3>
+    <p class="text-muted mb-0">Chỉnh sửa hồ sơ y tế và danh mục phân nhóm của thuốc.</p>
 </div>
 
-<div class="custom-card">
+<div class="custom-card p-4">
     <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
 
         <input type="hidden" asp-for="MaThuoc" />
+        <input type="hidden" asp-for="SoLuongTon" />
 
-        <div class="row g-4">
+        <div class="row g-3">
             <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-sm">Tên Thuốc <span class="text-danger">*</span></label>
-                <input asp-for="TenThuoc" class="form-control" required />
-            </div>
+                <label class="form-label fw-bold text-dark">Tên thương mại của thuốc <span
+                    class="text-danger">*</span></label>
+                    <input asp-for="TenThuoc" class="form-control shadow-none" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold text-dark">Tên các hoạt chất chính <span
+                        class="text-danger">*</span></label>
+                        <input asp-for="HoatChat" class="form-control shadow-none" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark">Giá Nhập (VNĐ)</label>
+                        <input asp-for="GiaNhap" type="number" min="0" class="form-control shadow-none" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark">Giá Bán / Xuất (VNĐ)</label>
+                        <input asp-for="GiaBan" type="number" min="0" class="form-control shadow-none" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark">Hạn Sử Dụng</label>
+                        <input asp-for="HanSuDung" type="date" class="form-control shadow-none" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark">Đơn vị tính gốc <span class="text-danger">*</span></label>
+                        <select asp-for="MaDVT" class="form-select shadow-none" asp-items="ViewBag.DonViTinhList" required>
+                            <option value="">-- Chọn đơn vị tính --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold text-dark">Nhóm bệnh khuyên dùng / Điều trị <span
+                            class="text-danger">*</span></label>
+                            <select name="MaNhomBenh" class="form-select shadow-none" asp-items="ViewBag.NhomBenhList" required>
+                                <option value="">-- Chọn nhóm bệnh điều trị chính --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-dark">Công Dụng / Chỉ Định Điều Trị</label>
+                            <textarea asp-for="CongDung" class="form-control shadow-none" rows="3"></textarea>
+                        </div>
+                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-sm">Hoạt Chất <span class="text-danger">*</span></label>
-                <input asp-for="HoatChat" class="form-control" required />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold text-dark fs-sm">Giá Nhập (VNĐ)</label>
-                <input asp-for="GiaNhap" type="number" class="form-control" min="0" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold text-dark fs-sm">Giá Bán (VNĐ)</label>
-                <input asp-for="GiaBan" type="number" class="form-control" min="0" />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label fw-bold text-dark fs-sm">Số Lượng Tồn</label>
-                <input asp-for="SoLuongTon" type="number" class="form-control" min="0" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold text-dark fs-sm">Hạn Sử Dụng</label>
-                <input asp-for="HanSuDung" type="date" class="form-control" required />
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-sm">Nhà Cung Cấp</label>
-                <select asp-for="MaNCC" class="form-select" asp-items="ViewBag.MaNCC">
-                    <option value="">-- Chọn Nhà Cung Cấp --</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-sm">Đơn Vị Tính</label>
-                <select asp-for="MaDVT" class="form-select" asp-items="ViewBag.MaDVT">
-                    <option value="">-- Chọn Đơn Vị --</option>
-                </select>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label fw-bold text-dark fs-sm">Công Dụng / Chỉ Định</label>
-                <textarea asp-for="CongDung" class="form-control" rows="3"></textarea>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-end align-items-center mt-5 pt-3 border-top">
-            <a asp-action="Index" class="btn btn-light me-3 fw-medium">Hủy bỏ</a>
-            <button type="submit" class="btn btn-primary px-4 fw-medium shadow-sm" style="border-radius: 8px;">
-                <i class="bi bi-floppy me-2"></i>Cập Nhật
-            </button>
-        </div>
-    </form>
-</div>
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-light px-4">Hủy thay đổi</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-medium"><i class="bi bi-save me-2"></i>Lưu cập
+                            nhật</button>
+                        </div>
+                    </form>
+                </div>

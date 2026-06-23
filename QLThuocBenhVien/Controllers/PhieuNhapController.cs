@@ -45,8 +45,12 @@ namespace QLThuocBenhVien.Controllers
         // GET: PhieuNhap/Create
         public async Task<IActionResult> Create()
         {
+            // Danh sách nhà cung cấp (bạn đã có)
             ViewBag.NhaCungCapList = new SelectList(await _context.NhaCungCap.ToListAsync(), "MaNCC", "TenNCC");
-            ViewBag.DonViTinhList = new SelectList(await _context.DonViTinh.ToListAsync(), "MaDVT", "TenDVT");
+
+            // THÊM DÒNG NÀY: Lấy danh sách thuốc từ danh mục để hiển thị ra bảng chọn
+            ViewBag.ThuocDanhMucList = await _context.Thuoc.ToListAsync();
+
             return View();
         }
 
@@ -55,81 +59,64 @@ namespace QLThuocBenhVien.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormCollection form, int MaNCC, string GhiChu)
         {
-            var tenThuocs = form["TenThuoc[]"];
-            var maDVTs = form["MaDVT[]"];
+            var maThuocs = form["MaThuoc[]"];
             var soLuongs = form["SoLuong[]"];
-            var donGias = form["DonGia[]"];
+            var donGiaNhaps = form["DonGiaNhap[]"];
+            var donGiaXuats = form["DonGiaXuat[]"];
 
-            if (tenThuocs.Count == 0 || MaNCC == 0) return RedirectToAction(nameof(Create));
+            if (maThuocs.Count == 0 || MaNCC == 0) return RedirectToAction(nameof(Create));
 
-            // 1. Khởi tạo đối tượng Phiếu Nhập Gốc
             var phieuNhap = new PhieuNhap
             {
                 MaNCC = MaNCC,
-                NgayNhap = DateTime.Now, // NÂNG CẤP: Lấy chính xác ngày, giờ, phút, giây thực tế lúc bấm Lưu
+                NgayNhap = DateTime.Now,
                 GhiChu = GhiChu,
                 TongTien = 0
             };
-
             _context.PhieuNhap.Add(phieuNhap);
-            await _context.SaveChangesAsync(); // Lưu trước để sinh MaPN tự động
+            await _context.SaveChangesAsync();
 
-            decimal tongTien = 0;
+            decimal tongTienPhieu = 0;
 
-            // 2. Lưu danh sách chi tiết hàng nhập và CỘNG DỒN VÀO KHO
-            for (int i = 0; i < tenThuocs.Count; i++)
+            // 2. Xử lý từng dòng thuốc nhập
+            for (int i = 0; i < maThuocs.Count; i++)
             {
-                if (!string.IsNullOrWhiteSpace(tenThuocs[i]))
+                if (int.TryParse(maThuocs[i], out int maThuoc) && maThuoc > 0)
                 {
                     int q = int.TryParse(soLuongs[i], out int qty) ? qty : 0;
-                    decimal p = decimal.TryParse(donGias[i], out decimal price) ? price : 0;
-                    int dvt = int.TryParse(maDVTs[i], out int d) ? d : 0;
 
-                    // NÂNG CẤP: Cắt bỏ mọi khoảng trắng thừa ở đầu/cuối chuỗi người dùng nhập
-                    string tenThuocNhap = tenThuocs[i].Trim();
+                    // FIX 1: Sửa chữ 'price' thành 'prc' cho khớp với biến out
+                    decimal pNhap = decimal.TryParse(donGiaNhaps[i], out decimal prc) ? prc : 0;
+                    decimal pXuat = decimal.TryParse(donGiaXuats[i], out decimal sale) ? sale : 0;
 
-                    var ct = new ChiTietPhieuNhap
-                    {
-                        MaPN = phieuNhap.MaPN,
-                        TenThuoc = tenThuocNhap,
-                        MaDVT = dvt,
-                        SoLuong = q,
-                        DonGia = p
-                    };
-                    _context.ChiTietPhieuNhap.Add(ct);
-                    tongTien += (q * p);
-
-                    // =========================================================================
-                    // 3. TỰ ĐỘNG CỘNG DỒN VÀO KHO THUỐC (MASTER DATA)
-                    // NÂNG CẤP: So sánh không phân biệt chữ hoa/chữ thường để tránh lỗi do gõ sai
-                    // =========================================================================
-                    var thuocTrongKho = await _context.Thuoc
-                        .FirstOrDefaultAsync(t => t.TenThuoc.ToLower() == tenThuocNhap.ToLower());
+                    // Lấy thuốc từ kho ra TRƯỚC để lấy thông tin Tên Thuốc và Đơn Vị Tính
+                    var thuocTrongKho = await _context.Thuoc.FindAsync(maThuoc);
 
                     if (thuocTrongKho != null)
                     {
-                        thuocTrongKho.SoLuongTon += q; // Cộng dồn số lượng
+                        var ct = new ChiTietPhieuNhap
+                        {
+                            MaPN = phieuNhap.MaPN,
+                            TenThuoc = thuocTrongKho.TenThuoc,
+                            MaDVT = thuocTrongKho.MaDVT ?? 0, // THÊM '?? 0' VÀO ĐÂY ĐỂ FIX LỖI
+                            SoLuong = q,
+                            DonGia = pNhap
+                        };
+                        _context.ChiTietPhieuNhap.Add(ct);
+                        tongTienPhieu += (q * pNhap);
+                        thuocTrongKho.SoLuongTon += q;
+
+                        // Cập nhật tồn kho và đơn giá xuất viện mới nhất
+                        thuocTrongKho.GiaNhap = pNhap; // Cập nhật Giá nhập mới nhất
+                        thuocTrongKho.GiaBan = pXuat;  // Cập nhật Giá xuất/bán mới nhất
                         _context.Thuoc.Update(thuocTrongKho);
                     }
                 }
             }
 
-            // 4. Cập nhật lại tổng tiền thực của phiếu nhập
-            phieuNhap.TongTien = tongTien;
+            phieuNhap.TongTien = tongTienPhieu;
             _context.PhieuNhap.Update(phieuNhap);
-
-            // 5. Đồng bộ ghi nhận vào Nhật ký hệ thống (Logs)
-            var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
-            _context.NhatKyHeThong.Add(new NhatKyHeThong
-            {
-                ThoiGian = DateTime.Now,
-                Loai = "Info",
-                NoiDung = $"Lập phiếu nhập kho #{phieuNhap.MaPN:D4}. Tổng giá trị: {tongTien:N0} đ",
-                NguoiThucHien = nguoiDung
-            });
-
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Đã lập thành công phiếu nhập #{phieuNhap.MaPN:D4} và cập nhật tồn kho!";
 
             return RedirectToAction(nameof(Index));
         }

@@ -16,112 +16,126 @@ namespace QLThuocBenhVien.Controllers
             _context = context;
         }
 
-        // ==========================================
-        // GET: Hiển thị danh sách thuốc (Có Tìm kiếm & Lọc)
-        // ==========================================
+        // GET: Thuoc/Index
+        // Thêm các tham số để hứng dữ liệu từ Form tìm kiếm gửi lên
+        // GET: Thuoc/Index
         public async Task<IActionResult> Index(string searchString, int? maNhomBenh, string trangThai)
         {
-            // 1. Lưu lại các giá trị lọc để hiển thị giữ nguyên trên giao diện sau khi load lại
             ViewData["CurrentSearch"] = searchString;
-            ViewData["CurrentNhomBenh"] = maNhomBenh;
             ViewData["CurrentTrangThai"] = trangThai;
-
-            // 2. Đổ dữ liệu ra Dropdown list Nhóm bệnh
             ViewBag.NhomBenhList = new SelectList(await _context.NhomBenh.ToListAsync(), "MaNhomBenh", "TenNhomBenh", maNhomBenh);
 
-            // 3. Lấy toàn bộ Query gốc
             var query = _context.Thuoc
-                .Include(t => t.ThuocNhomBenhs)
-                .ThenInclude(tnb => tnb.NhomBenh)
+                .Include(t => t.DonViTinh)
+                .Include(t => t.ThuocNhomBenhs).ThenInclude(tn => tn.NhomBenh)
                 .AsQueryable();
 
-            // --- BẮT ĐẦU LỌC DỮ LIỆU ---
-
-            // A. Lọc theo Tên thuốc
+            // SỬA TẠI ĐÂY: Ép về ToLower() để tìm kiếm chuẩn xác trên Server nếu form bị submit
             if (!string.IsNullOrEmpty(searchString))
             {
-                query = query.Where(t => t.TenThuoc.Contains(searchString));
+                string key = searchString.Trim().ToLower();
+                query = query.Where(t => t.TenThuoc.ToLower().Contains(key) || t.HoatChat.ToLower().Contains(key));
             }
 
-            // B. Lọc theo Nhóm bệnh
-            if (maNhomBenh.HasValue)
+            if (maNhomBenh.HasValue && maNhomBenh.Value > 0)
             {
-                query = query.Where(t => t.ThuocNhomBenhs.Any(tnb => tnb.MaNhomBenh == maNhomBenh));
+                query = query.Where(t => t.ThuocNhomBenhs.Any(tn => tn.MaNhomBenh == maNhomBenh.Value));
             }
-
-            // C. Lọc theo Trạng thái (Dựa vào số lượng tồn kho thực tế)
             if (!string.IsNullOrEmpty(trangThai))
             {
-                if (trangThai == "HetHang")
-                    query = query.Where(t => t.SoLuongTon == 0);
-                else if (trangThai == "SapHet")
-                    query = query.Where(t => t.SoLuongTon > 0 && t.SoLuongTon <= 50); // Mức cảnh báo sắp hết là <= 50
-                else if (trangThai == "AnToan")
-                    query = query.Where(t => t.SoLuongTon > 50);
+                var today = DateTime.Now.Date;
+                var baThangToi = today.AddMonths(3);
+
+                switch (trangThai)
+                {
+                    case "AnToan":
+                        query = query.Where(t => t.SoLuongTon > 50 && t.HanSuDung > baThangToi);
+                        break;
+                    case "SapHetHang":
+                        query = query.Where(t => t.SoLuongTon > 0 && t.SoLuongTon <= 50);
+                        break;
+                    case "HetHang":
+                        query = query.Where(t => t.SoLuongTon == 0);
+                        break;
+                    case "SapHetHan":
+                        query = query.Where(t => t.HanSuDung >= today && t.HanSuDung <= baThangToi);
+                        break;
+                    case "DaHetHan":
+                        query = query.Where(t => t.HanSuDung < today);
+                        break;
+                }
             }
 
-            // Thực thi truy vấn và trả về
-            var danhSachThuoc = await query.ToListAsync();
-            return View(danhSachThuoc);
+            return View(await query.OrderByDescending(t => t.MaThuoc).ToListAsync());
         }
-
         // ==========================================
         // 1. CHỨC NĂNG THÊM MỚI (CREATE)
         // ==========================================
-        [HttpGet]
+        // GET: Thuoc/Create
         public IActionResult Create()
         {
-            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC");
-            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT");
+            // Lấy danh sách từ CSDL gửi ra giao diện để đưa vào Dropdown
+            ViewBag.DonViTinhList = new SelectList(_context.DonViTinh.ToList(), "MaDVT", "TenDVT");
+            ViewBag.NhomBenhList = new SelectList(_context.NhomBenh.ToList(), "MaNhomBenh", "TenNhomBenh");
+
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Thuoc thuoc)
+        public async Task<IActionResult> Create(Thuoc thuoc, int MaNhomBenh) // Thêm tham số MaNhomBenh vào đây
         {
             if (ModelState.IsValid)
             {
+                thuoc.SoLuongTon = 0; // Mặc định tồn kho bằng 0 khi khai báo mới
                 _context.Add(thuoc);
+                await _context.SaveChangesAsync(); // Lưu để EF Core sinh ra MaThuoc tự động
 
-                // --- BỔ SUNG GHI LOG ---
-                var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
-                _context.NhatKyHeThong.Add(new NhatKyHeThong
+                // Sau khi có MaThuoc, tiến hành lưu liên kết Nhóm Bệnh
+                if (MaNhomBenh > 0)
                 {
-                    ThoiGian = DateTime.Now,
-                    Loai = "Info",
-                    NoiDung = $"Thêm mới thuốc vào kho: {thuoc.TenThuoc}",
-                    NguoiThucHien = nguoiDung
-                });
-                // -----------------------
+                    _context.ThuocNhomBenh.Add(new ThuocNhomBenh
+                    {
+                        MaThuoc = thuoc.MaThuoc,
+                        MaNhomBenh = MaNhomBenh
+                    });
+                    await _context.SaveChangesAsync();
+                }
 
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
-            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+
+            // Nếu lỗi, load lại danh sách cho Dropdown
+            ViewBag.DonViTinhList = new SelectList(_context.DonViTinh.ToList(), "MaDVT", "TenDVT");
+            ViewBag.NhomBenhList = new SelectList(_context.NhomBenh.ToList(), "MaNhomBenh", "TenNhomBenh");
             return View(thuoc);
         }
-
         // ==========================================
         // 2. CHỨC NĂNG CHỈNH SỬA (EDIT)
         // ==========================================
-        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var thuoc = await _context.Thuoc.FindAsync(id);
+            var thuoc = await _context.Thuoc
+                .Include(t => t.ThuocNhomBenhs)
+                .FirstOrDefaultAsync(m => m.MaThuoc == id);
+
             if (thuoc == null) return NotFound();
 
-            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
-            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+            // Lấy ID nhóm bệnh hiện tại để hiển thị sẵn trên Dropdown
+            int currentNhomBenhId = thuoc.ThuocNhomBenhs?.FirstOrDefault()?.MaNhomBenh ?? 0;
+
+            ViewBag.DonViTinhList = new SelectList(await _context.DonViTinh.ToListAsync(), "MaDVT", "TenDVT", thuoc.MaDVT);
+            ViewBag.NhomBenhList = new SelectList(await _context.NhomBenh.ToListAsync(), "MaNhomBenh", "TenNhomBenh", currentNhomBenhId);
+
             return View(thuoc);
         }
 
+        // POST: Thuoc/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Thuoc thuoc)
+        public async Task<IActionResult> Edit(int id, Thuoc thuoc, int MaNhomBenh)
         {
             if (id != thuoc.MaThuoc) return NotFound();
 
@@ -129,58 +143,76 @@ namespace QLThuocBenhVien.Controllers
             {
                 try
                 {
+                    // 1. Cập nhật thông tin cơ bản của thuốc
                     _context.Update(thuoc);
 
-                    // --- BỔ SUNG GHI LOG ---
-                    var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
-                    _context.NhatKyHeThong.Add(new NhatKyHeThong
+                    // 2. Cập nhật Nhóm Bệnh Khuyên Dùng (Xóa cũ, Thêm mới)
+                    var oldNhomBenhs = _context.ThuocNhomBenh.Where(tn => tn.MaThuoc == id).ToList();
+                    _context.ThuocNhomBenh.RemoveRange(oldNhomBenhs);
+
+                    if (MaNhomBenh > 0)
                     {
-                        ThoiGian = DateTime.Now,
-                        Loai = "Warning",
-                        NoiDung = $"Cập nhật thông tin thuốc: {thuoc.TenThuoc}",
-                        NguoiThucHien = nguoiDung
-                    });
-                    // -----------------------
+                        _context.ThuocNhomBenh.Add(new ThuocNhomBenh
+                        {
+                            MaThuoc = id,
+                            MaNhomBenh = MaNhomBenh
+                        });
+                    }
 
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhật thông tin thuốc thành công!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!_context.Thuoc.Any(e => e.MaThuoc == thuoc.MaThuoc)) return NotFound();
                     else throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewBag.MaNCC = new SelectList(_context.NhaCungCap, "MaNCC", "TenNCC", thuoc.MaNCC);
-            ViewBag.MaDVT = new SelectList(_context.DonViTinh, "MaDVT", "TenDVT", thuoc.MaDVT);
+
+            ViewBag.DonViTinhList = new SelectList(_context.DonViTinh.ToList(), "MaDVT", "TenDVT", thuoc.MaDVT);
+            ViewBag.NhomBenhList = new SelectList(_context.NhomBenh.ToList(), "MaNhomBenh", "TenNhomBenh", MaNhomBenh);
             return View(thuoc);
         }
 
         // ==========================================
         // 3. CHỨC NĂNG XÓA (DELETE)
         // ==========================================
-        public async Task<IActionResult> Delete(int id)
+        // POST: Thuoc/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var thuoc = await _context.Thuoc.FindAsync(id);
-            if (thuoc != null)
+            try
             {
-                var tenThuocDaXoa = thuoc.TenThuoc; // Lưu lại tên để ghi log
-                _context.Thuoc.Remove(thuoc);
-
-                // --- BỔ SUNG GHI LOG ---
-                var nguoiDung = User.FindFirst("FullName")?.Value ?? "Hệ thống";
-                _context.NhatKyHeThong.Add(new NhatKyHeThong
+                var thuoc = await _context.Thuoc.FindAsync(id);
+                if (thuoc != null)
                 {
-                    ThoiGian = DateTime.Now,
-                    Loai = "Danger",
-                    NoiDung = $"Đã xóa thuốc khỏi hệ thống: {tenThuocDaXoa}",
-                    NguoiThucHien = nguoiDung
-                });
-                // -----------------------
+                    // 1. XÓA BẢNG CON TRƯỚC: Tìm và xóa các liên kết Nhóm Bệnh của thuốc này
+                    var danhSachLienKet = _context.ThuocNhomBenh.Where(tn => tn.MaThuoc == id).ToList();
+                    if (danhSachLienKet.Any())
+                    {
+                        _context.ThuocNhomBenh.RemoveRange(danhSachLienKet);
+                    }
 
-                await _context.SaveChangesAsync();
+                    // 2. XÓA BẢNG CHA: Sau khi bảng con đã dọn sạch, tiến hành xóa Thuốc
+                    _context.Thuoc.Remove(thuoc);
+
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"Đã xóa thuốc {thuoc.TenThuoc} khỏi hệ thống thành công!";
+                }
+
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(Index));
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            {
+                // 3. XỬ LÝ NGOẠI LỆ THỰC TẾ (RẤT QUAN TRỌNG)
+                // Nếu thuốc này ĐÃ TỪNG ĐƯỢC LẬP PHIẾU NHẬP hoặc PHIẾU XUẤT, SQL Server sẽ tiếp tục chặn không cho xóa để bảo vệ dữ liệu kế toán.
+                // Thay vì sập trang web (như ảnh bạn chụp), ta bắt lỗi và báo ra màn hình cho người dùng biết.
+
+                TempData["ErrorMessage"] = "Không thể xóa! Thuốc này đã phát sinh chứng từ Nhập/Xuất kho. Vui lòng giữ lại để đảm bảo lịch sử đối soát kế toán.";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

@@ -45,10 +45,9 @@
         </div>
 
         <div class="custom-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-capsule me-2"></i>Danh mục thuốc xuất kho</h5>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="addDrugRow">
-                    <i class="bi bi-plus-lg me-1"></i> Thêm dòng thuốc
+            <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+                <button type="button" class="btn btn-outline-primary shadow-none" id="addDrugRow">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm Dòng Khác
                 </button>
             </div>
 
@@ -76,8 +75,8 @@
                                             : "Chưa phân nhóm";
 
                                         // Ghép cả Tên thuốc và Nhóm bệnh vào Text để Select2 tự động quét được cả 2
-                                        <option value="@t.MaThuoc" data-price="@t.GiaBan">@t.TenThuoc - Nhóm: @tenNhomBenh (Tồn:
-                                            @t.SoLuongTon)</option>
+                                        <option value="@t.MaThuoc" data-giaxuat="@t.GiaBan">@t.TenThuoc - Nhóm: @tenNhomBenh
+                                            (Tồn: @t.SoLuongTon)</option>
                                         }
                                     </select>
                                 </td>
@@ -118,13 +117,12 @@
                 </form>
 
                 @section Scripts {
-                    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
                     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
                     <script>
                         $(document).ready(function () {
-
-                        // Hàm khởi tạo công cụ tìm kiếm Select2
                         function initSelect2(element) {
                         element.select2({
                         theme: 'bootstrap-5',
@@ -133,83 +131,63 @@
                         });
                         }
 
-                        // Khởi tạo ngay cho dòng đầu tiên
                         initSelect2($('.drug-select'));
 
-                        // Hàm tính toán tổng tiền
                         function calculateTotals() {
                         let grandTotal = 0;
                         $('#detailsTable tbody .drug-row').each(function () {
                         const row = $(this);
-                        const selectedOption = row.find('.drug-select option:selected');
-
-                        let price = 0;
-                        if (selectedOption.val() !== "") {
-                        price = parseFloat(selectedOption.attr('data-price')) || 0;
-                        row.find('.drug-price').val(price); // Tự điền giá
-                        }
-
                         const qty = parseInt(row.find('.drug-qty').val()) || 0;
+                        const price = parseFloat(row.find('.drug-price').val()) || 0;
                         const rowTotal = qty * price;
-                        grandTotal += rowTotal;
 
                         row.find('.drug-total').val(rowTotal.toLocaleString('vi-VN') + " đ");
+                        grandTotal += rowTotal;
                         });
-
                         $('#invoiceGrandTotal').text(grandTotal.toLocaleString('vi-VN') + " VNĐ");
                         }
 
-                        // Bắt sự kiện khi người dùng chọn một loại thuốc mới trong Select2
                         $('#detailsTable').on('change', '.drug-select', function () {
+                        const row = $(this).closest('.drug-row');
+                        const selectedOption = $(this).find('option:selected');
+                        let price = parseFloat(selectedOption.data('giaxuat')) || 0;
+                        row.find('.drug-price').val(price);
                         calculateTotals();
                         });
 
-                        // Bắt sự kiện khi gõ số lượng
                         $('#detailsTable').on('input', '.drug-qty', function () {
                         calculateTotals();
                         });
 
-                        // Thêm dòng mới
+                        // ================= ĐÃ SỬA LẠI LOGIC THÊM DÒNG TỐI ƯU =================
                         $('#addDrugRow').click(function () {
-                        const index = $('#detailsTable tbody .drug-row').length;
+                        const tableBody = $('#detailsTable tbody');
+                        const index = tableBody.find('.drug-row').length;
 
-                        // Lấy toàn bộ mã HTML danh sách thuốc gốc (để copy sang dòng mới)
-                        const optionsHtml = $('#detailsTable tbody .drug-row:first .drug-select').html();
+                        // 1. Phá hủy Select2 của dòng đầu tiên để lấy HTML sạch (Tránh lỗi nhân đôi tùy chọn)
+                        const firstSelect = tableBody.find('.drug-row:first .drug-select');
+                        firstSelect.select2('destroy');
 
-                        const newRow = `
-                        <tr class="drug-row">
-                        <td>
-                        <select name="chiTietList[${index}].MaThuoc" class="form-select drug-select shadow-none" required>
-                        ${optionsHtml}
-                        </select>
-                        </td>
-                        <td>
-                        <input type="number" name="chiTietList[${index}].SoLuong" class="form-control drug-qty shadow-none" min="1" value="1" required />
-                        </td>
-                        <td>
-                        <input type="number" name="chiTietList[${index}].DonGia" class="form-control drug-price shadow-none" readonly />
-                        </td>
-                        <td>
-                        <input type="text" class="form-control drug-total shadow-none bg-light fw-bold text-dark" value="0 đ" readonly />
-                        </td>
-                        <td class="text-center">
-                        <button type="button" class="btn btn-link text-danger p-0 delete-row-btn shadow-none"><i class="bi bi-trash fs-5"></i></button>
-                        </td>
-                        </tr>
-                        `;
+                        // 2. Clone dòng đầu tiên (lúc này là thẻ <select> thuần túy)
+                        const newRow = tableBody.find('.drug-row:first').clone();
 
-                        $('#detailsTable tbody').append(newRow);
+                        // 3. Reset giá trị và cập nhật TÊN CHỈ MỤC (index) cho cấu trúc List C#
+                        newRow.find('.drug-select').attr('name', `chiTietList[${index}].MaThuoc`).val('');
+                        newRow.find('.drug-qty').attr('name', `chiTietList[${index}].SoLuong`).val(1);
+                        newRow.find('.drug-price').attr('name', `chiTietList[${index}].DonGia`).val('');
+                        newRow.find('.drug-total').val('0 đ');
 
-                        // Khởi tạo công cụ tìm kiếm cho dòng vừa mới thêm
-                        const newSelect = $('#detailsTable tbody .drug-row:last .drug-select');
-                        initSelect2(newSelect);
-                        newSelect.val('').trigger('change'); // Đặt về trạng thái chưa chọn
+                        // 4. Thêm dòng mới vào bảng
+                        tableBody.append(newRow);
+
+                        // 5. Kích hoạt lại Select2 cho TOÀN BỘ các thẻ select trong bảng
+                        initSelect2($('.drug-select'));
+                        calculateTotals();
                         });
 
-                        // Xóa dòng
+                        // Xóa dòng và sắp xếp lại Index
                         $('#detailsTable').on('click', '.delete-row-btn', function () {
-                        const rows = $('#detailsTable tbody .drug-row');
-                        if (rows.length > 1) {
+                        if ($('#detailsTable tbody .drug-row').length > 1) {
                         $(this).closest('.drug-row').remove();
 
                         // Cập nhật lại số thứ tự ID để gửi dữ liệu về Controller không bị đứt quãng
@@ -221,9 +199,11 @@
 
                         calculateTotals();
                         } else {
-                        alert('Hóa đơn xuất kho bắt buộc phải có ít nhất một dược phẩm!');
+                        alert('Phiếu xuất kho phải có ít nhất một dược phẩm!');
                         }
                         });
                         });
                     </script>
                 }
+
+                
