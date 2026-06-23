@@ -1,1 +1,5 @@
-{"build": {"builder": "NIXPACKS", "buildCommand": "dotnet publish -c Release -o out"}, "deploy": {"startCommand": "dotnet out/QLThuocBenhVien.dll"}} 
+{
+  "deploy": {
+    "startCommand": "dotnet QLThuocBenhVien.dll"
+  }
+}
